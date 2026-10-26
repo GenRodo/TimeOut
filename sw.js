@@ -1,5 +1,5 @@
 /* Permite instalar la app y abrirla sin conexión. Siempre intenta traer la versión más nueva primero. */
-const CACHE = 'horario-v2';
+const CACHE = 'horario-v3';
 const ARCHIVOS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(ARCHIVOS))); self.skipWaiting(); });
 self.addEventListener('activate', e => {

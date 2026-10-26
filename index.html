@@ -99,6 +99,7 @@ tr.cov td{padding:8px 6px 6px}
 .mes .c-ok{color:var(--ok)}.mes .c-over{color:var(--over);font-weight:700}.mes .c-under,.mes .c-warn{color:var(--under);font-weight:700}
 .mes small{display:block;font-size:11px;font-weight:400}
 .metas{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:14px;align-items:flex-end}
+.metas .cerrb{margin-left:auto}
 .metas label{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:3px}
 .metas input{width:90px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
 .psel{display:flex;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
@@ -463,7 +464,7 @@ function normReps(){S.nov.forEach(n=>{n.reps=n.reps||{};Object.keys(n.reps).forE
 normReps();
 const FER_BASE={"2026-01-01": "Año Nuevo", "2026-04-03": "Viernes Santo", "2026-04-04": "Sábado Santo", "2026-05-01": "Día del Trabajo", "2026-05-21": "Glorias Navales", "2026-06-21": "Día de los Pueblos Indígenas", "2026-06-29": "San Pedro y San Pablo", "2026-07-16": "Virgen del Carmen", "2026-08-15": "Asunción de la Virgen", "2026-09-18": "Independencia Nacional", "2026-09-19": "Glorias del Ejército", "2026-10-12": "Encuentro de Dos Mundos", "2026-10-31": "Iglesias Evangélicas y Protestantes", "2026-11-01": "Todos los Santos", "2026-12-08": "Inmaculada Concepción", "2026-12-25": "Navidad", "2027-01-01": "Año Nuevo", "2027-03-26": "Viernes Santo", "2027-03-27": "Sábado Santo", "2027-05-01": "Día del Trabajo", "2027-05-21": "Glorias Navales", "2027-06-21": "Día de los Pueblos Indígenas", "2027-06-28": "San Pedro y San Pablo", "2027-07-16": "Virgen del Carmen", "2027-08-15": "Asunción de la Virgen", "2027-09-18": "Independencia Nacional", "2027-09-19": "Glorias del Ejército", "2027-10-11": "Encuentro de Dos Mundos", "2027-10-31": "Iglesias Evangélicas y Protestantes", "2027-11-01": "Todos los Santos", "2027-12-08": "Inmaculada Concepción", "2027-12-25": "Navidad"};
 if(!S.feriados){S.feriados={};Object.keys(FER_BASE).forEach(d=>{S.feriados[d]={n:FER_BASE[d],cerrado:false};});}
-S.extras=S.extras||[];S.anticipos=S.anticipos||[];S.consumos=S.consumos||[];
+S.extras=S.extras||[];S.anticipos=S.anticipos||[];S.consumos=S.consumos||[];S.cerrados=S.cerrados||{};
 if(!S.notasMes){S.notasMes={};if(S.notas&&Object.keys(S.notas).length)S.notasMes[S.meses[0]]=S.notas;}
 if(S.metas.antFull==null)S.metas.antFull=200000;if(S.metas.antPart==null)S.metas.antPart=150000;
 const AUT='Autorizado por supervisor';
@@ -598,6 +599,17 @@ function diasPagar(p,ym){if(p.c==='Apoyo')return null;const f=ym+'-01',l=lastDay
   const st=p.desde&&ymOf(p.desde)===ym?+p.desde.slice(8):1,en=p.hasta&&ymOf(p.hasta)===ym?Math.min(+p.hasta.slice(8),base):base;
   let d=Math.max(0,en-st+1);S.nov.forEach(n=>{if(n.p===p.n&&(n.tipo==='psg'||n.tipo==='lic'))d-=novDays(n,ym);});return Math.max(0,d);}
 
+/* ---------- meses cerrados: al cerrar se guarda el cierre tal como está y el mes queda de solo lectura ---------- */
+const mesCerr=ym=>!!S.cerrados[ym];
+const cerrMsg=ym=>ymName(ym)+' está cerrado: se puede ver, pero no cambiar. Para editarlo, reábrelo en Cierre.';
+const cerrDesde=d=>Object.keys(S.cerrados).filter(ym=>ym>=ymOf(d)).sort()[0]||null;
+const cerrFecha=(ym,y)=>new Date(S.cerrados[ym].fecha).toLocaleString('es-CL',Object.assign({day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',hourCycle:'h23'},y?{year:'numeric'}:{}));
+/* filas del cierre: las guardadas si el mes está cerrado; si no, calculadas ahora (requiere index() del mismo mes) */
+function cierreFilas(ym){const z=S.cerrados[ym];if(z)return z.filas;const L=[];
+  AREAS.forEach(a=>inArea(a).forEach(p=>{const q=cierre(p,ym),c=cMes(p,ym);q.saldo=c==='Apoyo'||p.vac==null?null:p.vac-vacUsed(p);if(c==='Apoyo'){q.trabD=0;q.trabH=0;q.ap=0;}
+    L.push({n:p.n,a,c,cl:cLbl(p,ym),cargo:cargoOf(p),rut:p.rut||null,full:p.full||null,ingreso:p.ingreso||null,q});}));
+  return L;}
+
 /* ---------- piezas visuales ---------- */
 function mm(m){return m>=60?fh(m/60)+' h':m+' min';}
 function realDiff(t){const sp=span(t),near=(v,ref)=>{while(v<ref-720)v+=1440;while(v>ref+720)v-=1440;return v;};
@@ -680,20 +692,20 @@ function vResumen(){const m=S.metas,W=weeksOf(ui.mes);
   return h+`</tbody></table></div><p class="nota">Horas programadas, brutas (entrada a salida, sin descontar colación). Las semanas parciales en full time solo muestran las horas. Las ausencias y reemplazos se ven en el cierre del mes.</p>`;}
 
 const CCOLS=[['pagar','Días a pagar'],['trabD','Días trabajados'],['trabH','Horas trabajadas'],['ap','Aperturas (h)'],['fallaH','Fallas (h a descontar)'],['atr','Atrasos (min)'],['sal','Salidas anticipadas (min)'],['vac','Vacaciones (días)'],['saldo','Saldo vacaciones'],['psg','Permiso sin goce (días)'],['lic','Licencia (días)'],['cubre','Cubrió turnos (h)'],['extra','Horas extra'],['libres','Días libres trabajados'],['libH','Días libres trabajados (h)'],['ferD','Feriados trabajados (días)'],['fer','Feriados trabajados (h)'],['apoD','Apoyo (días)'],['apoH','Apoyo (h)'],['antic','Anticipo ($)'],['cons','Consumo ($)']];
-function vCierre(){const ym=ui.mes;
-  let h=`<div class="metas"><label>Días base de la liquidación<select data-meta2="base"><option value="30"${S.metas.base!=='mes'?' selected':''}>30 días siempre</option><option value="mes"${S.metas.base==='mes'?' selected':''}>Días del mes (28 a 31)</option></select></label></div>`;
-  h+=revision(ym);
+function vCierre(){const ym=ui.mes,z=S.cerrados[ym],base=z?z.base:S.metas.base;
+  let h=z?`<div class="banner"><span><b>Mes cerrado</b> el ${cerrFecha(ym)}. Estas cifras quedaron guardadas y el mes no se puede cambiar.</span><button class="btn" data-act="reabrir">Reabrir mes</button></div>`
+    :`<div class="metas"><label>Días base de la liquidación<select data-meta2="base"><option value="30"${S.metas.base!=='mes'?' selected':''}>30 días siempre</option><option value="mes"${S.metas.base==='mes'?' selected':''}>Días del mes (28 a 31)</option></select></label><button class="btn cerrb" data-act="cerrar">Cerrar ${MESES[+ym.slice(5,7)-1]}</button></div>`+revision(ym);
   h+=`<div class="scroll"><table class="cierre"><thead><tr><th>Trabajador</th><th>Contrato</th>${CCOLS.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>`;
+  const FI=cierreFilas(ym);
   AREAS.forEach(a=>{h+=`<tr class="grp"><th colspan="${CCOLS.length+2}">${a}</th></tr>`;
-    inArea(a).forEach(p=>{const r=cierre(p,ym);r.saldo=p.vac==null?null:p.vac-vacUsed(p);
-      h+=`<tr><td class="n"><button class="nm" data-act="persona" data-p="${esc(p.n)}">${esc(tc(p.n))}</button></td><td>${cLbl(p,ym)}</td>`;
+    FI.filter(f=>f.a===a).forEach(f=>{const r=f.q;
+      h+=`<tr><td class="n"><button class="nm" data-act="persona" data-p="${esc(f.n)}">${esc(tc(f.n))}</button></td><td>${esc(f.cl)}</td>`;
       CCOLS.forEach(([k])=>{let v=r[k],cls='';
-        if(k==='saldo'){h+=p.c==='Apoyo'?'<td class="z">–</td>':(v==null?'<td class="z" title="Falta ingresar días disponibles">–</td>':`<td class="${v<0?'neg':''}">${fh(v)}</td>`);return;}
-        if(p.c==='Apoyo'&&['trabD','trabH','ap'].includes(k))v=0;
-        if((k==='pagar')||(k==='trabH'&&cMes(p,ym)==='Part')||(p.c==='Apoyo'&&(k==='apoH'||k==='apoD')))cls='k';
+        if(k==='saldo'){h+=f.c==='Apoyo'?'<td class="z">–</td>':(v==null?'<td class="z" title="Falta ingresar días disponibles">–</td>':`<td class="${v<0?'neg':''}">${fh(v)}</td>`);return;}
+        if((k==='pagar')||(k==='trabH'&&f.c==='Part')||(f.c==='Apoyo'&&(k==='apoH'||k==='apoD')))cls='k';
         h+=v?`<td class="${cls}">${fh(v)}</td>`:'<td class="z">–</td>';});
       h+='</tr>';});});
-  h+=`</tbody></table></div><p class="nota">Días a pagar: base de ${S.metas.base==='mes'?'los días del mes':'30 días'}, menos permisos sin goce y licencias; si alguien entró o salió este mes, cuenta desde su ingreso o hasta su salida. Vacaciones y feriados no se descuentan, y las fallas se descuentan en horas. Días y horas trabajadas muestran lo que realmente trabajó según el horario. Vacaciones se cuentan en días hábiles (lunes a viernes, sin restar feriados); permiso sin goce y licencia, en días corridos. Puedes ajustar los días en cada ausencia.</p>`;
+  h+=`</tbody></table></div><p class="nota">Días a pagar: base de ${base==='mes'?'los días del mes':'30 días'}, menos permisos sin goce y licencias; si alguien entró o salió este mes, cuenta desde su ingreso o hasta su salida. Vacaciones y feriados no se descuentan, y las fallas se descuentan en horas. Días y horas trabajadas muestran lo que realmente trabajó según el horario. Vacaciones se cuentan en días hábiles (lunes a viernes, sin restar feriados); permiso sin goce y licencia, en días corridos. Puedes ajustar los días en cada ausencia.</p>`;
   const L=S.nov.filter(n=>ymOf(n.d1)<=ym&&ymOf(n.d2)>=ym).sort((a,b)=>a.d1<b.d1?-1:1);
   {const XL=[];S.extras.filter(x=>ymOf(x.d)===ym).forEach(x=>XL.push({p:x.p,d:x.d,s:x.s,e:x.e,txt:x.m||'Horas extra',act:`data-act="ed" data-p="${esc(x.p)}" data-d="${x.d}"`}));
     realExtras(ym).forEach(x=>XL.push(Object.assign(x,{act:`data-act="ed" data-p="${esc(x.p)}" data-d="${x.d}"`})));
@@ -778,7 +790,7 @@ function backupDl(){if(!caps.downloads)return;const data=JSON.stringify({app:'ho
   caps.downloads.save({filename:'Respaldo_horario_'+TODAY+'.json',data:new Blob([data],{type:'application/json'})}).then(()=>toast('Respaldo descargado.')).catch(e=>{if(e&&e.code==='declined')return;toast('No se pudo descargar el respaldo.');});}
 function loadBackup(txt){let o;try{o=JSON.parse(txt);}catch(e){toast('El archivo no es un respaldo válido.');return;}
   const st=o&&o.estado?o.estado:o;if(!st||!Array.isArray(st.turnos)||!Array.isArray(st.personas)||!Array.isArray(st.meses)||!st.meses.length){toast('El archivo no es un respaldo de este horario.');return;}
-  pushUndo();S.personas=st.personas;S.turnos=st.turnos;S.meses=st.meses.sort();S.metas=Object.assign({},S.metas,st.metas||{});S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.notasMes=st.notasMes||(st.notas?{[st.meses[0]]:st.notas}:{});
+  pushUndo();S.personas=st.personas;S.turnos=st.turnos;S.meses=st.meses.sort();S.metas=Object.assign({},S.metas,st.metas||{});S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.notasMes=st.notasMes||(st.notas?{[st.meses[0]]:st.notas}:{});
   S.personas.forEach(p=>{if(!('desde' in p))p.desde=null;if(!('hasta' in p))p.hasta=null;if(!('vac' in p))p.vac=null;});S.turnos.forEach((t,i)=>{if(!t.id)t.id='t'+i;});normReps();
   if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];changed();dlg.close();toast('Respaldo cargado. Revisa y presiona Guardar para dejarlo.',true);}
 const hs=x=>x.slice(3)==='00'?x.slice(0,2):x;
@@ -813,10 +825,11 @@ function vPersona(){let p=person(ui.persona);if(!p||!ACT[p.n]){p=S.personas.find
   if(p.desde)info.push('Desde el '+flong(p.desde));if(p.hasta)info.push('Hasta el '+flong(p.hasta));
   const vac=p.c==='Apoyo'?'':(p.vac==null?'Vacaciones: falta ingresar los días disponibles':`Vacaciones: ${fh(p.vac)} disponibles, ${fh(used)} usadas, saldo ${fh(p.vac-used)}`);
   h+=`<div class="pcard"><div><h2>${esc(tc(p.n))}</h2>${p.full?`<p><b>${esc(p.full)}</b></p>`:''}<p>${esc(info.join('. '))}</p>${vac?`<p>${vac}</p>`:''}</div><div class="acts"><button class="btn" data-act="editper" data-p="${esc(p.n)}">Editar datos</button>${isVac(p.n)?`<button class="btn pri" data-act="asignar" data-p="${esc(p.n)}">Asignar a trabajador nuevo</button>`:(p.hasta?'':`<button class="btn" data-act="baja" data-p="${esc(p.n)}">Desvincular</button>`)}<button class="btn" data-act="nuevo">Agregar trabajador</button></div></div>`;
-  {const q=cierre(p,ui.mes),sv=p.vac==null?'Sin dato':fh(p.vac-used);
-    const items=p.c==='Apoyo'?[['Días de apoyo',fh(q.apoD)],['Horas de apoyo',fh(q.apoH)],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]]
-      :[['Días a pagar',fh(q.pagar),1],['Días trabajados',fh(q.trabD)],['Horas trabajadas',fh(q.trabH),cMes(p,ui.mes)==='Part'],['Horas de apertura',fh(q.ap)],['Horas extra',fh(q.extra)],['Cubrió turnos',fh(q.cubre)+' h'],['Días libres trabajados',q.libres+(q.libH?' ('+fh(q.libH)+' h)':'')],['Feriados trabajados',q.ferD+(q.fer?' ('+fh(q.fer)+' h)':'')],['Fallas',fh(q.fallaH)+' h'],['Atrasos',fh(q.atr)+' min'],['Salidas anticipadas',fh(q.sal)+' min'],['Vacaciones',fh(q.vac)+' días'],['Saldo vacaciones',sv],['Permiso sin goce',fh(q.psg)+' días'],['Licencia',fh(q.lic)+' días'],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]];
-    h+=`<h3 class="sth">Resumen de ${MESES[+ui.mes.slice(5,7)-1]}</h3><div class="stats">${items.map(([k,v,hi])=>`<div class="st${hi?' hi':''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;}
+  {const z=S.cerrados[ui.mes],f=z&&z.filas.find(x=>x.n===p.n),q=f?f.q:cierre(p,ui.mes),c=f?f.c:cMes(p,ui.mes);
+    const sv=f?(q.saldo==null?'Sin dato':fh(q.saldo)):(p.vac==null?'Sin dato':fh(p.vac-used));
+    const items=c==='Apoyo'?[['Días de apoyo',fh(q.apoD)],['Horas de apoyo',fh(q.apoH)],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]]
+      :[['Días a pagar',fh(q.pagar),1],['Días trabajados',fh(q.trabD)],['Horas trabajadas',fh(q.trabH),c==='Part'],['Horas de apertura',fh(q.ap)],['Horas extra',fh(q.extra)],['Cubrió turnos',fh(q.cubre)+' h'],['Días libres trabajados',q.libres+(q.libH?' ('+fh(q.libH)+' h)':'')],['Feriados trabajados',q.ferD+(q.fer?' ('+fh(q.fer)+' h)':'')],['Fallas',fh(q.fallaH)+' h'],['Atrasos',fh(q.atr)+' min'],['Salidas anticipadas',fh(q.sal)+' min'],['Vacaciones',fh(q.vac)+' días'],['Saldo vacaciones',sv],['Permiso sin goce',fh(q.psg)+' días'],['Licencia',fh(q.lic)+' días'],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]];
+    h+=`<h3 class="sth">Resumen de ${MESES[+ui.mes.slice(5,7)-1]}${f?' (mes cerrado)':''}</h3><div class="stats">${items.map(([k,v,hi])=>`<div class="st${hi?' hi':''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;}
   if(narrow()){h+='<h3 class="sth">Horario</h3>';weeksOf(ui.mes).forEach(w=>{const st=stats(p,w);h+=`<div class="card wk"><div class="wkh"><b>Semana ${w.n}</b><span class="muted">${w.lbl}</span><span class="wkm st-${p.c==='Apoyo'?'neutral':st.cls}">${fh(st.h)} h${st.meta?' · '+esc(st.meta):''}</span></div>${w.days.filter(x=>x.inMonth).map(x=>{const c=cellBtn(p,x);return c?`<div class="drow"><span class="dl">${DIAS[x.dow]} ${x.day}</span>${c}</div>`:'';}).join('')}</div>`;});return h;}
   h+='<h3 class="sth">Horario</h3><div class="scroll"><table class="grid"><thead><tr><th class="who">Semana</th>';DIAS.forEach(d=>{h+=`<th scope="col">${d}</th>`;});h+='</tr></thead><tbody>';
   weeksOf(ui.mes).forEach(w=>{const st=stats(p,w);
@@ -851,9 +864,10 @@ function render(){index();
   const side=`<aside class="side"><div class="brand"><span class="logo">N</span><div><b>NOVU</b><small>Horario del personal</small></div></div>
     <nav class="snav" aria-label="Secciones">${NAV.map(([v,l,k])=>`<button data-act="vista" data-v="${v}" title="${l}" class="${navOn(v)?'on':''}"${navOn(v)?' aria-current="page"':''}>${ico(k)}<span>${l}</span></button>`).join('')}</nav>
     <div class="sfoot"><button data-act="crear" title="Crear meses">${ico('calplus')}<span>Crear meses</span></button>${caps.downloads?`<button data-act="export" title="Exportar a Excel">${ico('dl')}<span>Exportar a Excel</span></button>`:''}<button data-act="resp" title="Respaldo">${ico('arch')}<span>Respaldo</span></button><button data-act="conn" title="Conexión">${ico('users')}<span>Conexión</span></button></div></aside>`;
-  const mesnav=ui.vista==='hoy'?'':`<div class="mesnav"><button class="icon" data-act="mesmov" data-v="-1" aria-label="Mes anterior"${i<=0?' disabled':''}>${ico('cl')}</button><select data-act="mes" aria-label="Mes">${S.meses.map(m=>`<option value="${m}"${m===ui.mes?' selected':''}>${ymName(m)}</option>`).join('')}</select><button class="icon" data-act="mesmov" data-v="1" aria-label="Mes siguiente"${i>=S.meses.length-1?' disabled':''}>${ico('cr')}</button></div>`;
+  const mesnav=ui.vista==='hoy'?'':`<div class="mesnav"><button class="icon" data-act="mesmov" data-v="-1" aria-label="Mes anterior"${i<=0?' disabled':''}>${ico('cl')}</button><select data-act="mes" aria-label="Mes">${S.meses.map(m=>`<option value="${m}"${m===ui.mes?' selected':''}>${ymName(m)}${mesCerr(m)?' · cerrado':''}</option>`).join('')}</select><button class="icon" data-act="mesmov" data-v="1" aria-label="Mes siguiente"${i>=S.meses.length-1?' disabled':''}>${ico('cr')}</button></div>`;
   const top=`<header class="topbar"><div class="tl"><button class="icon sidet" data-act="sidet" aria-label="${isMini()?'Mostrar menú':'Ocultar menú'}" title="${isMini()?'Mostrar menú':'Ocultar menú'}">${ico('menu')}</button><h1>${TITLES[ui.vista]}</h1>${mesnav}</div><div class="tr">${est}<button class="icon" data-act="undo" aria-label="Deshacer" title="Deshacer"${undo.length?'':' disabled'}>${ico('undo')}</button><button class="icon mas" data-act="mas" aria-label="Más opciones">${ico('more')}</button><button class="btn pri" data-act="save" aria-label="Guardar"${loading?' disabled':''}>${ico('save')}<span>Guardar</span></button></div></header>`;
-  const banner=(window.__vacio?'<div class="banner"><span>Tu Google Drive todavía no tiene datos. Carga tu respaldo y presiona Guardar.</span><button class="btn" data-act="resp">Cargar respaldo</button></div>':'')+(window.__draftMsg?'<div class="banner"><span>Recuperamos cambios que no alcanzaste a guardar.</span><button class="btn" data-act="descartar">Descartar cambios</button></div>':'');
+  const banner=(window.__vacio?'<div class="banner"><span>Tu Google Drive todavía no tiene datos. Carga tu respaldo y presiona Guardar.</span><button class="btn" data-act="resp">Cargar respaldo</button></div>':'')+(window.__draftMsg?'<div class="banner"><span>Recuperamos cambios que no alcanzaste a guardar.</span><button class="btn" data-act="descartar">Descartar cambios</button></div>':'')
+    +(ui.vista!=='hoy'&&ui.vista!=='cierre'&&mesCerr(ui.mes)?`<div class="banner"><span>${esc(cerrMsg(ui.mes))}</span><button class="btn" data-act="vista" data-v="cierre">Ver cierre</button></div>`:'');
   let sub='';
   if(ui.vista==='semana'||ui.vista==='resumen'||ui.vista==='mes'){
     sub=`<div class="subbar"><div class="seg" aria-label="Vista">${[['semana',narrow()?'Día':'Semana'],['mes','Mes'],['resumen','Resumen semanal']].map(v=>`<button data-act="vista" data-v="${v[0]}" aria-pressed="${ui.vista===v[0]}">${v[1]}</button>`).join('')}</div>`;
@@ -906,9 +920,9 @@ function vSemanaMovil(w,areas){
   return h;}
 
 /* ---------- estado y deshacer ---------- */
-const snapshot=()=>JSON.stringify({p:S.personas,t:S.turnos,m:S.metas,n:S.nov,ms:S.meses,f:S.feriados,x:S.extras,a:S.anticipos,c:S.consumos,nm:S.notasMes});
+const snapshot=()=>JSON.stringify({p:S.personas,t:S.turnos,m:S.metas,n:S.nov,ms:S.meses,f:S.feriados,x:S.extras,a:S.anticipos,c:S.consumos,nm:S.notasMes,z:S.cerrados});
 function pushUndo(){undo.push(snapshot());if(undo.length>30)undo.shift();}
-function restore(o){S.personas=o.p;S.turnos=o.t;S.metas=o.m;S.nov=o.n||[];normReps();S.feriados=o.f||S.feriados;S.extras=o.x||[];S.anticipos=o.a||[];S.consumos=o.c||[];S.notasMes=o.nm||S.notasMes;S.meses=o.ms||S.meses;if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];}
+function restore(o){S.personas=o.p;S.turnos=o.t;S.metas=o.m;S.nov=o.n||[];normReps();S.feriados=o.f||S.feriados;S.extras=o.x||[];S.anticipos=o.a||[];S.consumos=o.c||[];S.notasMes=o.nm||S.notasMes;S.meses=o.ms||S.meses;S.cerrados=o.z||{};if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];}
 function changed(){dirty=true;try{localStorage.setItem(DKEY,JSON.stringify({base:S.guardado,data:JSON.parse(snapshot())}));}catch(e){}render();}
 function doUndo(){const x=undo.pop();if(!x)return;restore(JSON.parse(x));changed();if($('#ed').open)$('#ed').close();}
 function toast(msg,undoable){const t=$('#toast');t.innerHTML=`<span>${esc(msg)}</span>${undoable?'<button data-act="undo">Deshacer</button>':''}`;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),6000);}
@@ -1087,7 +1101,35 @@ function draw(){let h='<div class="ed">';const m=ed.mode;
     h+=`<h2>Crear meses</h2><p class="f">Cada día nuevo copia el turno de dos semanas antes, así se mantiene la rotación 6x1 / 5x2 y el domingo por medio libre. Las ausencias y apoyos no se copian.</p>`;
     h+=fld('Crear desde '+ymName(nextYm(last))+' hasta',sel('hasta',opts,F.hasta),'Quienes estén desvinculados no se copian. Después puedes ajustar cualquier turno a mano.');
     h+=`<footer><button class="btn" data-ed="close">Cancelar</button><button class="btn pri" data-ed="crearsave">Crear ${n} ${n===1?'mes':'meses'}</button></footer>`;}
-  dlg.innerHTML=h+'</div>';}
+  else if(m==='cerrar'){const mes=MESES[+ui.mes.slice(5,7)-1];
+    h+=`<h2>Cerrar ${mes}</h2><p class="f">El cierre queda guardado tal como se ve ahora: días a pagar, horas, ausencias, anticipos y consumo. Aunque después cambies metas, contratos o datos de alguien, el cierre de ${mes} no cambia.</p>`;
+    h+=`<p class="f">Mientras esté cerrado, sus turnos, ausencias, horas extra, feriados, anticipos, consumos y notas se pueden ver, pero no cambiar. Si necesitas corregir algo, reábrelo.</p><p class="f">Revisa antes los pendientes de la revisión. Después presiona Guardar para dejarlo en tu Drive.</p>`;
+    h+=`<footer><button class="btn" data-ed="close">Cancelar</button><button class="btn pri" data-ed="cerrarok">Cerrar ${mes}</button></footer>`;}
+  else if(m==='reabrir'){const mes=MESES[+ui.mes.slice(5,7)-1];
+    h+=`<h2>Reabrir ${mes}</h2><p class="f">Se descarta el cierre guardado y ${mes} vuelve a calcularse con los datos actuales; si cambiaste metas, contratos o datos de alguien desde que lo cerraste, las cifras pueden cambiar.</p><p class="f">El mes se podrá editar de nuevo. Cuando termines, ciérralo otra vez.</p>`;
+    h+=`<footer><button class="btn" data-ed="close">Cancelar</button><button class="btn pri" data-ed="reabrirok">Reabrir ${mes}</button></footer>`;}
+  const ro=edSoloLect();if(ro)h=h.replace('<div class="ed">',`<div class="ed"><div class="banner">${esc(ro)}</div>`);
+  dlg.innerHTML=h+'</div>';
+  if(ro)dlg.querySelectorAll('input,select,textarea,button').forEach(el=>{if(el.dataset.ed!=='close'&&el.dataset.ed!=='novedit')el.disabled=true;});}
+
+/* mes cerrado que tocaría guardar el diálogo abierto (null si ninguno) */
+function edBloq(){const m=ed.mode,L=[],add=d=>{if(d)L.push(ymOf(d));};
+  const orig=(A,k)=>{const o=F.id&&A.find(x=>x.id===F.id);if(o)add(o[k]);};
+  if(m==='turno')add(ed.d);
+  else if(m==='nov'){range(F.d1,F.d2).forEach(add);const o=F.id&&S.nov.find(n=>n.id===F.id);if(o)range(o.d1,o.d2).forEach(add);}
+  else if(m==='swap'||m==='fer'||m==='ext')add(F.d);
+  else if(m==='nota')L.push(ui.mes);
+  else if(m==='ant'){orig(S.anticipos,'fecha');add(F.fecha);}
+  else if(m==='cons'){orig(S.consumos,'d');add(F.d);}
+  else if(m==='baja'&&F.sal)L.push(cerrDesde(F.sal));
+  else if(m==='asignar'&&F.desde)L.push(cerrDesde(addD(F.desde,-1)));
+  else if(m==='persona'&&F.orig&&F.c!==F.c0&&F.cdesde)L.push(cerrDesde(F.cdesde));
+  return L.find(ym=>ym&&mesCerr(ym))||null;}
+/* aviso si el diálogo es de un día o registro de un mes cerrado: se muestra sin poder cambiarlo */
+function edSoloLect(){const m=ed.mode;let ym=null;
+  if(['turno','nov','swap','fer','nota'].includes(m))ym=edBloq();
+  else if((m==='ant'||m==='cons')&&F.id){const o=(m==='ant'?S.anticipos:S.consumos).find(x=>x.id===F.id),d=o&&(m==='ant'?o.fecha:o.d);if(d&&mesCerr(ymOf(d)))ym=ymOf(d);}
+  return ym?cerrMsg(ym):'';}
 
 function openNov(p,tipo,d,existing){if(existing){F=JSON.parse(JSON.stringify(existing));F.horas=F.horas==null?'':F.horas;F.dias=F.dias==null?'':F.dias;F.reps=F.reps||{};}
   else F={p,tipo,d1:d,d2:d,horas:'',dias:'',min:'',reps:{}};F.err='';openD('nov');}
@@ -1113,6 +1155,10 @@ dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
         checkDraft();render();toast('Conectado a tu Google Drive.');})
       .catch(()=>{CONF=old;F.err='No se pudo conectar. Revisa la dirección y que el script esté publicado para "Cualquier persona".';draw();});return;}
   if(a==='respdl'){backupDl();return;}
+  if(a==='cerrarok'){const ym=ui.mes;pushUndo();S.cerrados[ym]={fecha:new Date().toISOString(),base:S.metas.base==='mes'?'mes':'30',filas:cierreFilas(ym)};
+    changed();dlg.close();toast(ymName(ym)+' cerrado. Presiona Guardar para dejarlo en tu Drive.',true);return;}
+  if(a==='reabrirok'){const ym=ui.mes;pushUndo();delete S.cerrados[ym];changed();dlg.close();toast(ymName(ym)+' reabierto: ya se puede editar.',true);return;}
+  if(a!=='novedit'){const ym=edBloq();if(ym){if(edSoloLect())toast(cerrMsg(ym));else{F.err=cerrMsg(ym);draw();}return;}}
   if(ed.mode==='turno'){const p=person(ed.p);
     if(a==='swap'){F={p:ed.p,d:ed.d,o:'',err:''};openD('swap');return;}
     if(a==='novnew'){openNov(ed.p,b.dataset.tipo,ed.d);return;}
@@ -1181,7 +1227,8 @@ dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
     const vac=F.c==='Apoyo'||F.vac===''||F.vac==null||isNaN(+F.vac)?null:+F.vac;pushUndo();
     if(F.orig){const p=person(F.orig);
       if(name!==F.orig){S.turnos.forEach(t=>{if(t.p===F.orig)t.p=name;});S.nov.forEach(n=>{if(n.p===F.orig)n.p=name;Object.values(n.reps||{}).forEach(L=>(L||[]).forEach(r=>{if(r.p===F.orig)r.p=name;}));});p.n=name;if(ui.persona===F.orig)ui.persona=name;}
-      if(p.a!==F.a){S.turnos.forEach(t=>{if(t.p===name)t.a=F.a;});p.a=F.a;}
+      if(name!==F.orig)Object.values(S.cerrados).forEach(z=>z.filas.forEach(f=>{if(f.n===F.orig)f.n=name;}));
+      if(p.a!==F.a){S.turnos.forEach(t=>{if(t.p===name&&!mesCerr(ymOf(t.d)))t.a=F.a;});p.a=F.a;}
       if(F.c!==p.c&&F.cdesde&&p.c!=='?'){const b=addD(F.cdesde,-1);p.cHist=(p.cHist||[]).filter(x=>x.hasta<b).concat([{hasta:b,c:cOn(p,b)}]);}
       p.c=F.c;p.vac=vac;p.full=String(F.full||'').trim()||null;p.ingreso=F.ingreso||null;p.cargo=String(F.cargo||'').trim()||null;p.rut=String(F.rut||'').trim()?rutFmt(F.rut):null;}
     else{S.personas.push({n:name,a:F.a,c:F.c,desde:F.desde||null,hasta:null,vac,full:String(F.full||'').trim()||null,ingreso:F.ingreso||F.desde||null,cargo:String(F.cargo||'').trim()||null,rut:String(F.rut||'').trim()?rutFmt(F.rut):null});ui.persona=name;ui.vista='persona';}
@@ -1204,7 +1251,7 @@ dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
     for(;;){genMonth(ym);n++;if(ym===target||n>24)break;ym=nextYm(ym);}
     ui.mes=first;ui.sem=1;changed();dlg.close();toast(n===1?ymName(first)+' creado.':n+' meses creados, hasta '+ymName(target)+'.',true);return;}});
 
-dlg.addEventListener('change',e=>{const t=e.target;
+dlg.addEventListener('change',e=>{const t=e.target;if(edSoloLect()){draw();return;}
   if(t.dataset.file==='resp'){const f=t.files&&t.files[0];if(!f)return;f.text().then(loadBackup).catch(()=>toast('No se pudo leer el archivo.'));return;}
   if(t.dataset.k&&ed.mode==='ext'){const k=t.dataset.k;F[k]=t.value;F.err='';if(k==='p'||k==='d'){extDefault();draw();}else{const el=dlg.querySelector('#extDur');if(el)el.textContent=F.s&&F.e?fh(dur(F.s,F.e))+' h extra':'';}return;}
   if(t.dataset.cl&&ed.mode==='turno'){const s=S.turnos.find(x=>x.id===t.closest('.edrow').dataset.id);if(!s)return;touch();s[t.dataset.cl]=t.value;changed();draw();return;}
@@ -1235,7 +1282,9 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   else if(a==='persona'){ui.persona=b.dataset.p;ui.vista='persona';render();window.scrollTo(0,0);}
   else if(a==='contrato'){const p=person(b.dataset.p);if(p.c!=='?'){editPer(p);return;}pushUndo();p.c=CONTR[(CONTR.indexOf(p.c)+1)%CONTR.length];changed();}
   else if(a==='undo'){doUndo();$('#toast').classList.remove('on');}
-  else if(a==='copiar')copyPrev();
+  else if(a==='copiar'){if(mesCerr(ui.mes))toast(cerrMsg(ui.mes));else copyPrev();}
+  else if(a==='cerrar')openD('cerrar');
+  else if(a==='reabrir')openD('reabrir');
   else if(a==='save')save();
   else if(a==='export'){if(caps.downloads)openD('xls');}
   else if(a==='resp')openD('resp');
@@ -1342,7 +1391,7 @@ const XW=(()=>{
   return {Book};})();
 
 function buildWorkbook(ym,mode){
-  const W=weeksOf(ym),B=new XW.Book(),r2=x=>Math.round(x*100)/100,tv=t=>mins(t)/1440,X=Object.assign;
+  const W=weeksOf(ym),B=new XW.Book(),r2=x=>Math.round(x*100)/100,tv=t=>mins(t)/1440,X=Object.assign,FI=cierreFilas(ym);
   const BLUE='1F3864';
   const ST={title:{b:1,sz:16,color:BLUE},sub:{sz:9,color:'595959'},
     hdr:{b:1,sz:9,fill:'C5DCE8',bd:1,h:'center',wrap:1},grp:{b:1,sz:10,fill:'EDEDED',bd:1},
@@ -1354,13 +1403,13 @@ function buildWorkbook(ym,mode){
   const gen='Generado el '+new Date().toLocaleString('es-CL',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
 
   /* Cierre */
-  {const s=B.sheet('Cierre'),nc=CCOLS.length+3;title(s,'Cierre de '+ymName(ym),nc,gen);
+  {const s=B.sheet('Cierre'),nc=CCOLS.length+3;title(s,'Cierre de '+ymName(ym),nc,S.cerrados[ym]?'Mes cerrado el '+cerrFecha(ym,1)+'. '+gen:gen);
     let r=3;['Área','Trabajador','Contrato'].concat(CCOLS.map(c=>c[1])).forEach((h,c)=>s.set(r,c,h,ST.hdr));s.heights[r]=42;
     s.width(0,10);s.width(1,18);s.width(2,12);CCOLS.forEach((_,i)=>s.width(i+3,11));s.freeze={r:4,c:2};r++;
     AREAS.forEach(a=>{s.set(r,0,a,ST.grp);for(let c=1;c<nc;c++)s.set(r,c,'',ST.grp);s.merge(r,0,r,nc-1);r++;
-      inArea(a).forEach(p=>{const q=cierre(p,ym);q.saldo=p.vac==null||p.c==='Apoyo'?null:p.vac-vacUsed(p);if(p.c==='Apoyo'){q.trabD=0;q.trabH=0;q.ap=0;}
-        s.set(r,0,a,ST.l);s.set(r,1,tc(p.n),X({},ST.l,{b:1}));s.set(r,2,cLbl(p,ym),ST.l);
-        CCOLS.forEach(([k],i)=>{const v=q[k];const key=(k==='pagar'&&p.c!=='Apoyo')||(k==='trabH'&&cMes(p,ym)==='Part')||(p.c==='Apoyo'&&(k==='apoH'||k==='apoD'));
+      FI.filter(f=>f.a===a).forEach(f=>{const q=f.q;
+        s.set(r,0,a,ST.l);s.set(r,1,tc(f.n),X({},ST.l,{b:1}));s.set(r,2,f.cl,ST.l);
+        CCOLS.forEach(([k],i)=>{const v=q[k];const key=(k==='pagar'&&f.c!=='Apoyo')||(k==='trabH'&&f.c==='Part')||(f.c==='Apoyo'&&(k==='apoH'||k==='apoD'));
           let st=key?ST.tot:ST.n;if(k==='saldo'&&v!=null&&v<0)st=X({},st,{color:'C00000',b:1});
           if(['fallaH','atr','sal','vac','psg','lic'].includes(k)&&v)st=X({},st,{color:'9C0006'});
           if(k==='antic'||k==='cons')st=X({},st,{fmt:'"$"#,##0'});s.set(r,i+3,v==null||v===0?'':r2(v),st);});r++;});});
@@ -1392,11 +1441,11 @@ function buildWorkbook(ym,mode){
   /* Fichas por trabajador */
   {const s=B.sheet('Fichas');s.breaks=[];[26,14,3,26,14].forEach((w,c)=>s.width(c,w));let r=0;
     const L={sz:10,bd:1},V={sz:10,bd:1,h:'right',b:1},MON={sz:10,bd:1,h:'right',b:1,fmt:'"$"#,##0'},HI={fill:'FCE4D6'};
-    AREAS.forEach(a=>inArea(a).forEach(p=>{const q=cierre(p,ym),ap=p.c==='Apoyo',saldo=p.vac==null||ap?'Sin dato':r2(p.vac-vacUsed(p));
-      s.set(r,0,p.full||tc(p.n),{b:1,sz:16,color:BLUE});s.merge(r,0,r,4);s.heights[r]=26;r++;
-      s.set(r,0,'Ficha de '+ymName(ym)+(p.ingreso?'. Ingreso: '+fdate(p.ingreso)+' '+p.ingreso.slice(0,4):''),ST.sub);r+=2;
-      [['Cargo',cargoOf(p)],['Área',p.a],['Contrato',cLbl(p,ym)],['RUT',p.rut||'Falta RUT']].forEach(([k,v],i)=>{const rr=r+Math.floor(i/2),c=(i%2)*3;s.set(rr,c,k,X({},L,{fill:'EDEDED',b:1}));s.set(rr,c+1,v,X({},L,k==='RUT'&&!p.rut?{color:'C00000',b:1}:{}));});r+=3;
-      const left=ap?[['Días de apoyo',q.apoD],['Horas de apoyo',q.apoH]]:[['Días a pagar',q.pagar,1],['Días trabajados',q.trabD],['Horas trabajadas',q.trabH,cMes(p,ym)==='Part'],['Horas de apertura',q.ap],['Horas extra',q.extra],['Horas cubriendo turnos',q.cubre],['Días libres trabajados',q.libres],['Horas en días libres',q.libH],['Feriados trabajados (días)',q.ferD],['Feriados trabajados (h)',q.fer]];
+    AREAS.forEach(a=>FI.filter(f=>f.a===a).forEach(f=>{const q=f.q,ap=f.c==='Apoyo',saldo=q.saldo==null?'Sin dato':r2(q.saldo);
+      s.set(r,0,f.full||tc(f.n),{b:1,sz:16,color:BLUE});s.merge(r,0,r,4);s.heights[r]=26;r++;
+      s.set(r,0,'Ficha de '+ymName(ym)+(f.ingreso?'. Ingreso: '+fdate(f.ingreso)+' '+f.ingreso.slice(0,4):''),ST.sub);r+=2;
+      [['Cargo',f.cargo],['Área',f.a],['Contrato',f.cl],['RUT',f.rut||'Falta RUT']].forEach(([k,v],i)=>{const rr=r+Math.floor(i/2),c=(i%2)*3;s.set(rr,c,k,X({},L,{fill:'EDEDED',b:1}));s.set(rr,c+1,v,X({},L,k==='RUT'&&!f.rut?{color:'C00000',b:1}:{}));});r+=3;
+      const left=ap?[['Días de apoyo',q.apoD],['Horas de apoyo',q.apoH]]:[['Días a pagar',q.pagar,1],['Días trabajados',q.trabD],['Horas trabajadas',q.trabH,f.c==='Part'],['Horas de apertura',q.ap],['Horas extra',q.extra],['Horas cubriendo turnos',q.cubre],['Días libres trabajados',q.libres],['Horas en días libres',q.libH],['Feriados trabajados (días)',q.ferD],['Feriados trabajados (h)',q.fer]];
       const right=(ap?[]:[['Fallas (h a descontar)',q.fallaH],['Atrasos (min)',q.atr],['Salidas anticipadas (min)',q.sal],['Vacaciones (días)',q.vac],['Saldo vacaciones',saldo],['Permiso sin goce (días)',q.psg],['Licencia (días)',q.lic]]).concat([['Anticipo',q.antic,0,1],['Consumo',q.cons,0,1]]);
       s.set(r,0,'Asistencia',ST.hdr);s.set(r,1,'',ST.hdr);s.merge(r,0,r,1);s.set(r,3,'Descuentos y pagos',ST.hdr);s.set(r,4,'',ST.hdr);s.merge(r,3,r,4);r++;
       const n=Math.max(left.length,right.length);
@@ -1526,7 +1575,7 @@ function api(method,body){const sep=CONF.url.includes('?')?'&':'?';
   const p=method==='GET'?fetch(CONF.url+sep+'key='+encodeURIComponent(CONF.key)+'&t='+Date.now()):fetch(CONF.url,{method:'POST',body:JSON.stringify(Object.assign({key:CONF.key},body))});
   return p.then(r=>r.json());}
 function applyState(st){S.personas=st.personas||[];S.turnos=st.turnos||[];S.meses=(st.meses&&st.meses.length?st.meses:S.meses).slice().sort();S.metas=Object.assign({},S.metas,st.metas||{});
-  S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];
+  S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};
   S.notasMes=st.notasMes||(st.notas&&Object.keys(st.notas).length?{[S.meses[0]]:st.notas}:{});S.guardado=st.guardado||null;
   S.personas.forEach(p=>{if(!('desde' in p))p.desde=null;if(!('hasta' in p))p.hasta=null;if(!('vac' in p))p.vac=null;});
   S.turnos.forEach((t,i)=>{if(!t.id)t.id='t'+i;});normReps();
