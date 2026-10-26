@@ -1254,7 +1254,9 @@ dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
     if(name!==F.orig&&person(name)){F.err='Ya existe alguien con ese nombre. Agrega una inicial del apellido para distinguirlos.';draw();return;}
     const vac=F.c==='Apoyo'||F.vac===''||F.vac==null||isNaN(+F.vac)?null:+F.vac;pushUndo();
     if(F.orig){const p=person(F.orig);
-      if(name!==F.orig){S.turnos.forEach(t=>{if(t.p===F.orig)t.p=name;});S.nov.forEach(n=>{if(n.p===F.orig)n.p=name;Object.values(n.reps||{}).forEach(L=>(L||[]).forEach(r=>{if(r.p===F.orig)r.p=name;}));});p.n=name;if(ui.persona===F.orig)ui.persona=name;}
+      if(name!==F.orig){S.turnos.forEach(t=>{if(t.p===F.orig)t.p=name;});S.nov.forEach(n=>{if(n.p===F.orig)n.p=name;Object.values(n.reps||{}).forEach(L=>(L||[]).forEach(r=>{if(r.p===F.orig)r.p=name;}));});
+        [S.extras,S.anticipos,S.consumos].forEach(A=>A.forEach(x=>{if(x.p===F.orig)x.p=name;}));S.personas.forEach(q=>{if(q.sigue===F.orig)q.sigue=name;});
+        p.n=name;if(ui.persona===F.orig)ui.persona=name;}
       if(name!==F.orig)Object.values(S.cerrados).forEach(z=>z.filas.forEach(f=>{if(f.n===F.orig)f.n=name;}));
       if(p.a!==F.a){S.turnos.forEach(t=>{if(t.p===name&&!mesCerr(ymOf(t.d)))t.a=F.a;});p.a=F.a;}
       if(F.c!==p.c&&F.cdesde&&p.c!=='?'){const b=addD(F.cdesde,-1);p.cHist=(p.cHist||[]).filter(x=>x.hasta<b).concat([{hasta:b,c:cOn(p,b)}]);}
