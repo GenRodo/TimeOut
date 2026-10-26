@@ -661,10 +661,10 @@ function coverage(area,w){const list=[];
   w.days.forEach(d=>{if(!d.inMonth){html+='<td class="out"></td>';return;}
     const c=per[d.iso],own=list.filter(x=>x.d===d.iso);
     if(!own.length){html+=`<td><span class="libre">${cerrado(d.iso)?'Cerrado':'Sin turnos'}</span></td>`;return;}
-    const a=Math.floor(Math.min(...own.map(x=>x.sp[0]))/60)-lo,b=Math.ceil(Math.max(...own.map(x=>x.sp[1]))/60)-lo,gaps=[];
+    const a=Math.min(...own.map(x=>x.sp[0])),b=Math.max(...own.map(x=>x.sp[1])),gaps=[];
     let svg=`<svg viewBox="0 0 ${N*6} 40" preserveAspectRatio="none" role="img" aria-label="Personas por hora el ${flong(d.iso)}">`;
     c.forEach((v,i)=>{const x=i*6;
-      if(v===0&&i>=a&&i<b){gaps.push(hh(lo+i)+':00');svg+=`<rect class="z" x="${x}" y="34" width="5" height="6"><title>${hh(lo+i)}:00 sin nadie</title></rect>`;}
+      if(v===0&&(lo+i)*60+30>=a&&(lo+i)*60+30<b){gaps.push(hh(lo+i)+':00');svg+=`<rect class="z" x="${x}" y="34" width="5" height="6"><title>${hh(lo+i)}:00 sin nadie</title></rect>`;}
       else if(v>0){const h=Math.max(3,v/mx*38);svg+=`<rect class="b" x="${x}" y="${40-h}" width="5" height="${h}"><title>${hh(lo+i)}:00, ${v} ${v===1?'persona':'personas'}</title></rect>`;}});
     html+=`<td>${svg}</svg><div class="ax"><span>${hh(lo)}</span><span>${hh(hi)}</span></div>${gaps.length?`<div class="alert">Sin nadie: ${gaps[0]}${gaps.length>1?' (+'+(gaps.length-1)+' h)':''}</div>`:''}</td>`;});
   return html+'</tr>';}
@@ -768,8 +768,9 @@ function vPagos(){const ym=ui.mes,mes=MESES[+ym.slice(5,7)-1],ord=(a,b)=>{const 
 function dayGaps(a,d){if(cerrado(d))return[];const L=[];
   S.personas.forEach(p=>{if(p.a!==a)return;const n=NOVIX[p.n+'|'+d];sh(p.n,d).forEach(t=>{if(!absT(n,t))L.push(span(t));});(EXIX[p.n+'|'+d]||[]).forEach(x=>L.push(span(x)));});
   REPS.forEach(o=>{if(o.d===d&&o.a===a)L.push(span(o));});if(!L.length)return[];
-  const lo=Math.floor(Math.min(...L.map(x=>x[0]))/60),hi=Math.ceil(Math.max(...L.map(x=>x[1]))/60),g=[];
-  for(let h=lo;h<hi;h++){const mid=h*60+30;if(!L.some(x=>x[0]<=mid&&x[1]>mid))g.push(pad(h%24)+':00');}return g;}
+  const mn=Math.min(...L.map(x=>x[0])),mx=Math.max(...L.map(x=>x[1])),g=[];
+  /* solo horas cuya media cae entre la primera entrada y la última salida: un turno que termina a las 21:30 no deja "sin nadie" a las 21:00 */
+  for(let h=Math.floor(mn/60);h<Math.ceil(mx/60);h++){const mid=h*60+30;if(mid>=mn&&mid<mx&&!L.some(x=>x[0]<=mid&&x[1]>mid))g.push(pad(h%24)+':00');}return g;}
 function revision(ym){const G={};const add=(k,txt,act)=>{(G[k]=G[k]||[]).push({txt,act});};
   const ps=S.personas.filter(p=>ACT[p.n]);
   ps.filter(p=>p.c==='?').forEach(p=>add('Contrato sin definir',`${tc(p.n)}: falta definir si es full o part time.`,`data-act="editper" data-p="${esc(p.n)}"`));
