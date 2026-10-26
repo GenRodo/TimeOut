@@ -110,6 +110,8 @@ dialog::backdrop{background:rgba(10,16,15,.45)}
 .ed{padding:18px}
 .ed h2{margin:0;font-size:22px;font-weight:800;font-stretch:115%}
 .ed .f{margin:2px 0 14px;color:var(--muted)}
+.ed .difl{margin:0 0 12px;padding-left:20px}
+.ed .difl li{margin:3px 0}
 .edrow{display:grid;grid-template-columns:1fr auto 1fr auto;gap:8px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}
 .edrow input,.edrow select{padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:var(--bg);width:100%}
 .edrow .dur{font-weight:700;font-variant-numeric:tabular-nums;min-width:44px;text-align:right}
@@ -513,6 +515,7 @@ const ymName=ym=>tc(MESES[+ym.slice(5,7)-1])+' '+ym.slice(0,4);
 const fdate=s=>DIAS[dow(s)]+' '+(+s.slice(8))+' '+MESES[+s.slice(5,7)-1].slice(0,3);
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const flong=s=>DIASL[dow(s)]+' '+(+s.slice(8))+' de '+MESES[+s.slice(5,7)-1];
+const fFH=(isoT,y)=>new Date(isoT).toLocaleString('es-CL',Object.assign({day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',hourCycle:'h23'},y?{year:'numeric'}:{}));
 const nid=(p)=>(p||'t')+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 const person=n=>S.personas.find(x=>x.n===n);
 const active=(p,d)=>(!p.desde||p.desde<=d)&&(!p.hasta||p.hasta>=d);
@@ -603,7 +606,7 @@ function diasPagar(p,ym){if(p.c==='Apoyo')return null;const f=ym+'-01',l=lastDay
 const mesCerr=ym=>!!S.cerrados[ym];
 const cerrMsg=ym=>ymName(ym)+' está cerrado: se puede ver, pero no cambiar. Para editarlo, reábrelo en Cierre.';
 const cerrDesde=d=>Object.keys(S.cerrados).filter(ym=>ym>=ymOf(d)).sort()[0]||null;
-const cerrFecha=(ym,y)=>new Date(S.cerrados[ym].fecha).toLocaleString('es-CL',Object.assign({day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',hourCycle:'h23'},y?{year:'numeric'}:{}));
+const cerrFecha=(ym,y)=>fFH(S.cerrados[ym].fecha,y);
 /* filas del cierre: las guardadas si el mes está cerrado; si no, calculadas ahora (requiere index() del mismo mes) */
 function cierreFilas(ym){const z=S.cerrados[ym];if(z)return z.filas;const L=[];
   AREAS.forEach(a=>inArea(a).forEach(p=>{const q=cierre(p,ym),c=cMes(p,ym);q.saldo=c==='Apoyo'||p.vac==null?null:p.vac-vacUsed(p);if(c==='Apoyo'){q.trabD=0;q.trabH=0;q.ap=0;}
@@ -790,6 +793,24 @@ function backupDl(){if(!caps.downloads)return;const data=JSON.stringify({app:'ho
   caps.downloads.save({filename:'Respaldo_horario_'+TODAY+'.json',data:new Blob([data],{type:'application/json'})}).then(()=>toast('Respaldo descargado.')).catch(e=>{if(e&&e.code==='declined')return;toast('No se pudo descargar el respaldo.');});}
 function loadBackup(txt){let o;try{o=JSON.parse(txt);}catch(e){toast('El archivo no es un respaldo válido.');return;}
   const st=o&&o.estado?o.estado:o;if(!st||!Array.isArray(st.turnos)||!Array.isArray(st.personas)||!Array.isArray(st.meses)||!st.meses.length){toast('El archivo no es un respaldo de este horario.');return;}
+  const riesgo=respRiesgo(st);if(riesgo.length){F={st,riesgo,dif:respDif(st)};openD('respconf');return;}
+  applyBackup(st);}
+/* motivos para avisar antes de reemplazar lo actual: respaldo más antiguo que lo guardado, sin fecha, o cambios sin guardar */
+function respRiesgo(st){const L=[];
+  if(S.guardado&&!st.guardado)L.push('El respaldo no dice cuándo se guardó, así que no se puede comparar con lo que está en tu Drive.');
+  else if(S.guardado&&st.guardado<S.guardado)L.push(`El respaldo es de lo guardado el ${fFH(st.guardado,1)}, pero tu Drive tiene una versión más nueva, del ${fFH(S.guardado,1)}. Lo que se guardó entre esas fechas se pierde.`);
+  if(dirty)L.push('Tienes cambios sin guardar en este equipo y se reemplazan por el respaldo.');
+  return L;}
+/* qué cambia al cargar el respaldo, comparado con lo que se ve ahora */
+function respDif(st){const L=[],n=(x,a,b)=>x+' '+(x===1?a:b);
+  const cmp=(k,lbl,key)=>{const K=key||(x=>x.id),B={},A={};(st[k]||[]).forEach(x=>{B[K(x)]=JSON.stringify(x);});(S[k]||[]).forEach(x=>{A[K(x)]=1;});
+    let q=0,c=0,g=0;(S[k]||[]).forEach(x=>{const b=B[K(x)];if(b==null)q++;else if(b!==JSON.stringify(x))c++;});(st[k]||[]).forEach(x=>{if(!A[K(x)])g++;});
+    const P=[q&&n(q,'se quita','se quitan'),c&&n(c,'cambia','cambian'),g&&n(g,'se agrega','se agregan')].filter(Boolean);if(P.length)L.push(lbl+': '+P.join(', ')+'.');};
+  cmp('turnos','Turnos');cmp('nov','Ausencias');cmp('extras','Horas extra');cmp('anticipos','Anticipos');cmp('consumos','Consumos');cmp('personas','Trabajadores',p=>p.n);
+  const mq=S.meses.filter(m=>!st.meses.includes(m));if(mq.length)L.push('Meses que desaparecen: '+mq.map(ymName).join(', ')+'.');
+  const cz=Object.keys(S.cerrados).filter(m=>!(st.cerrados||{})[m]);if(cz.length)L.push('Meses que vuelven a quedar abiertos: '+cz.map(ymName).join(', ')+'.');
+  return L;}
+function applyBackup(st){
   pushUndo();S.personas=st.personas;S.turnos=st.turnos;S.meses=st.meses.sort();S.metas=Object.assign({},S.metas,st.metas||{});S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.notasMes=st.notasMes||(st.notas?{[st.meses[0]]:st.notas}:{});
   S.personas.forEach(p=>{if(!('desde' in p))p.desde=null;if(!('hasta' in p))p.hasta=null;if(!('vac' in p))p.vac=null;});S.turnos.forEach((t,i)=>{if(!t.id)t.id='t'+i;});normReps();
   if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];changed();dlg.close();toast('Respaldo cargado. Revisa y presiona Guardar para dejarlo.',true);}
@@ -1074,8 +1095,13 @@ function draw(){let h='<div class="ed">';const m=ed.mode;
     h+=`<footer>${F.txt?'<button class="btn" data-ed="notadel">Quitar nota</button>':''}<button class="btn" data-ed="close">Cancelar</button><button class="btn pri" data-ed="notasave">Guardar nota</button></footer>`;}
   else if(m==='resp'){h+=`<h2>Respaldo</h2><p class="f">Un archivo con todo: meses, trabajadores, ausencias, horas extra, feriados, anticipos y consumo. Guárdalo en tu computador o en Drive.</p>`;
     h+=`<div class="absbtns"><button class="btn pri" data-ed="respdl"${caps.downloads?'':' disabled title="La descarga funciona en el horario publicado"'}>Descargar respaldo</button><label class="btn">Cargar respaldo<input type="file" accept=".json,application/json" data-file="resp" hidden></label></div>`;
-    h+='<p class="hint" style="margin-top:12px">Cargar un respaldo reemplaza todo lo que ves ahora (puedes deshacerlo). Después revisa y presiona Guardar.</p>';
+    h+='<p class="hint" style="margin-top:12px">Cargar un respaldo reemplaza todo lo que ves ahora (puedes deshacerlo). Si es más antiguo que lo guardado en tu Drive, te avisa antes. Después revisa y presiona Guardar.</p>';
     h+=`<footer><button class="btn" data-ed="close">Cerrar</button></footer>`;}
+  else if(m==='respconf'){h+=`<h2>¿Cargar este respaldo?</h2><p class="f">Revisa esto antes de reemplazar lo que ves ahora.</p>`;
+    h+=F.riesgo.map(t=>`<div class="banner">${esc(t)}</div>`).join('');
+    h+=F.dif.length?`<p class="f">Comparado con lo que tienes ahora:</p><ul class="difl">${F.dif.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:'<p class="f">El respaldo tiene los mismos datos que ves ahora.</p>';
+    h+=`<p class="hint">Si tienes dudas, descarga primero un respaldo de lo actual para poder volver a él.</p>`;
+    h+=`<footer><button class="btn" data-ed="close">Cancelar</button><button class="btn" data-ed="respdl"${caps.downloads?'':' disabled'}>Descargar lo actual</button><button class="btn pri" data-ed="respok">Cargar igual</button></footer>`;}
   else if(m==='mas'){h+='<h2>Más opciones</h2><p class="f">'+ymName(ui.mes)+'</p>';
     if(undo.length)h+=`<button class="it" data-ed="mundo"><span><b>Deshacer</b><small>Vuelve atrás el último cambio.</small></span></button>`;
     h+=`<button class="it" data-ed="mcrear"><span><b>Crear meses</b><small>Arma los meses siguientes con la misma rotación.</small></span></button>`;
@@ -1155,6 +1181,7 @@ dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
         checkDraft();render();toast('Conectado a tu Google Drive.');})
       .catch(()=>{CONF=old;F.err='No se pudo conectar. Revisa la dirección y que el script esté publicado para "Cualquier persona".';draw();});return;}
   if(a==='respdl'){backupDl();return;}
+  if(a==='respok'){applyBackup(F.st);return;}
   if(a==='cerrarok'){const ym=ui.mes;pushUndo();S.cerrados[ym]={fecha:new Date().toISOString(),base:S.metas.base==='mes'?'mes':'30',filas:cierreFilas(ym)};
     changed();dlg.close();toast(ymName(ym)+' cerrado. Presiona Guardar para dejarlo en tu Drive.',true);return;}
   if(a==='reabrirok'){const ym=ui.mes;pushUndo();delete S.cerrados[ym];changed();dlg.close();toast(ymName(ym)+' reabierto: ya se puede editar.',true);return;}
