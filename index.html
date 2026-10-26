@@ -888,7 +888,7 @@ function render(){index();
     <div class="sfoot"><button data-act="crear" title="Crear meses">${ico('calplus')}<span>Crear meses</span></button>${caps.downloads?`<button data-act="export" title="Exportar a Excel">${ico('dl')}<span>Exportar a Excel</span></button>`:''}<button data-act="resp" title="Respaldo">${ico('arch')}<span>Respaldo</span></button><button data-act="conn" title="Conexión">${ico('users')}<span>Conexión</span></button></div></aside>`;
   const mesnav=ui.vista==='hoy'?'':`<div class="mesnav"><button class="icon" data-act="mesmov" data-v="-1" aria-label="Mes anterior"${i<=0?' disabled':''}>${ico('cl')}</button><select data-act="mes" aria-label="Mes">${S.meses.map(m=>`<option value="${m}"${m===ui.mes?' selected':''}>${ymName(m)}${mesCerr(m)?' · cerrado':''}</option>`).join('')}</select><button class="icon" data-act="mesmov" data-v="1" aria-label="Mes siguiente"${i>=S.meses.length-1?' disabled':''}>${ico('cr')}</button></div>`;
   const top=`<header class="topbar"><div class="tl"><button class="icon sidet" data-act="sidet" aria-label="${isMini()?'Mostrar menú':'Ocultar menú'}" title="${isMini()?'Mostrar menú':'Ocultar menú'}">${ico('menu')}</button><h1>${TITLES[ui.vista]}</h1>${mesnav}</div><div class="tr">${est}<button class="icon" data-act="undo" aria-label="Deshacer" title="Deshacer"${undo.length?'':' disabled'}>${ico('undo')}</button><button class="icon mas" data-act="mas" aria-label="Más opciones">${ico('more')}</button><button class="btn pri" data-act="save" aria-label="Guardar"${loading?' disabled':''}>${ico('save')}<span>Guardar</span></button></div></header>`;
-  const banner=(window.__vacio?'<div class="banner"><span>Tu Google Drive todavía no tiene datos. Carga tu respaldo y presiona Guardar.</span><button class="btn" data-act="resp">Cargar respaldo</button></div>':'')+(window.__draftMsg?'<div class="banner"><span>Recuperamos cambios que no alcanzaste a guardar.</span><button class="btn" data-act="descartar">Descartar cambios</button></div>':'')
+  const banner=(window.__scriptViejo?'<div class="banner"><span>Tu script de Google es de una versión anterior y la clave todavía viaja en la dirección web. Pega el Codigo.gs nuevo en script.google.com y publica una versión nueva (Implementar &gt; Gestionar implementaciones &gt; editar &gt; Nueva versión).</span></div>':'')+(window.__vacio?'<div class="banner"><span>Tu Google Drive todavía no tiene datos. Carga tu respaldo y presiona Guardar.</span><button class="btn" data-act="resp">Cargar respaldo</button></div>':'')+(window.__draftMsg?'<div class="banner"><span>Recuperamos cambios que no alcanzaste a guardar.</span><button class="btn" data-act="descartar">Descartar cambios</button></div>':'')
     +(ui.vista!=='hoy'&&ui.vista!=='cierre'&&mesCerr(ui.mes)?`<div class="banner"><span>${esc(cerrMsg(ui.mes))}</span><button class="btn" data-act="vista" data-v="cierre">Ver cierre</button></div>`:'');
   let sub='';
   if(ui.vista==='semana'||ui.vista==='resumen'||ui.vista==='mes'){
@@ -1599,9 +1599,13 @@ function exportX(mode){if(!caps.downloads)return;let data;
 const CONFK='horario-conf',CACHEK='horario-cache';let CONF=null,loading=false;
 try{CONF=JSON.parse(localStorage.getItem(CONFK)||'null');}catch(e){}
 caps.downloads={save:o=>new Promise(res=>{const u=URL.createObjectURL(o.data),a=document.createElement('a');a.href=u;a.download=o.filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(u);a.remove();},3000);res({status:'saved'});})};
-function api(method,body){const sep=CONF.url.includes('?')?'&':'?';
-  const p=method==='GET'?fetch(CONF.url+sep+'key='+encodeURIComponent(CONF.key)+'&t='+Date.now()):fetch(CONF.url,{method:'POST',body:JSON.stringify(Object.assign({key:CONF.key},body))});
-  return p.then(r=>r.json());}
+/* la clave va siempre dentro del mensaje (POST), nunca en la dirección. Si el script es de una versión anterior y no sabe leer por POST
+   (responde "datos incompletos"), se lee como antes por GET y se avisa que hay que actualizarlo */
+function api(method,body){const post=b=>fetch(CONF.url,{method:'POST',body:JSON.stringify(Object.assign({key:CONF.key},b))}).then(r=>r.json());
+  if(method!=='GET')return post(body);
+  return post({accion:'leer'}).then(r=>{if(!r||r.error!=='datos incompletos'){window.__scriptViejo=false;return r;}
+    window.__scriptViejo=true;const sep=CONF.url.includes('?')?'&':'?';
+    return fetch(CONF.url+sep+'key='+encodeURIComponent(CONF.key)+'&t='+Date.now()).then(x=>x.json());});}
 function applyState(st){S.personas=st.personas||[];S.turnos=st.turnos||[];S.meses=(st.meses&&st.meses.length?st.meses:S.meses).slice().sort();S.metas=Object.assign({},S.metas,st.metas||{});
   S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};
   S.notasMes=st.notasMes||(st.notas&&Object.keys(st.notas).length?{[S.meses[0]]:st.notas}:{});S.guardado=st.guardado||null;
