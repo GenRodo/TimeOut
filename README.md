@@ -1,4 +1,4 @@
-# Horario del personal
+# TimeOut: Horario del personal
 
 App para el horario, ausencias, horas extra, anticipos, consumo y cierre del mes del personal.
 Se instala en el computador y en el celular. Los datos se guardan en tu Google Drive, no en este repositorio.
