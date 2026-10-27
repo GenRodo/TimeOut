@@ -389,7 +389,7 @@ dialog::backdrop{background:rgba(18,19,18,.5);backdrop-filter:blur(2px)}
   .subbar .seg{max-width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
   .subbar .seg button{white-space:nowrap}
   .prow,.mrow{grid-template-columns:104px minmax(0,1fr)}
-  .bnav{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:10;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+  .bnav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:10;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
   .bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);padding:4px 0}
   .bnav button.on{color:var(--sel)}
   .bnav .ic{width:22px;height:22px}
@@ -462,6 +462,39 @@ dialog::backdrop{background:rgba(18,19,18,.5);backdrop-filter:blur(2px)}
 .mgrid tr.grp th{padding:5px 10px}
 .mc{min-height:26px}
 .prow,.mrow{padding:7px 0}
+/* Limpieza */
+.lmpfecha{border:1px solid var(--line);border-radius:10px;padding:7px 8px;background:var(--surface);color:var(--ink);font:inherit;font-weight:600;min-width:0}
+.lmphead{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap;margin-bottom:6px}
+.lmphead h3{margin:0;font-size:18px;font-weight:800}
+.lmphead .muted{margin:4px 0 0}
+.lmpwa{text-decoration:none;white-space:nowrap}
+.lmpmom{margin:20px 0 8px;font-size:12.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--sel)}
+.lmpb{margin-bottom:10px}
+.lmpb header{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.lmpb h4{margin:0;font-size:15.5px;font-weight:800;margin-right:auto}
+.lmpb .pill{margin:0}
+.lmpr{margin:6px 0 8px;font-size:14px}
+.lmpr small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.lmpsel{border:1px solid var(--sel);border-radius:8px;padding:4px 8px;background:var(--surface);color:var(--ink);font:inherit;font-weight:700}
+.lmpt{list-style:none;margin:0;padding:0}
+.lmpt li{position:relative;padding:6px 0 6px 28px;border-top:1px solid var(--line);font-size:14px;line-height:1.35}
+.lmpt li:first-child{border-top:0}
+.lmpt li::before{content:'';position:absolute;left:2px;top:8px;width:13px;height:13px;border:2px solid var(--muted);border-radius:4px}
+.lmpe{margin-bottom:12px}
+.lmpg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 10px}
+.lmprow{display:flex;gap:6px;align-items:center}
+.lmprow input{flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.lmpte{margin:4px 0 12px;padding-left:22px}
+.lmpte li{margin:5px 0}
+.lmpte .icon{width:32px;height:32px}
+.lmpte .icon:disabled,.lmpe .acts .icon:disabled{opacity:.35}
+.lmpsp{flex:1}
+.lmpsec{border-top:1px solid var(--line);padding:10px 0 4px}
+.lmppers{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:8px;font-size:13.5px}
+.lmppers label{display:inline-flex;gap:6px;align-items:center}
+.lmppers input{accent-color:var(--sel);width:16px;height:16px}
+@media (max-width:760px){.lmphead .lmpwa{width:100%;justify-content:center}.dayhead .dnav{flex-wrap:wrap}
+  .lmpte .lmprow{flex-wrap:wrap;justify-content:flex-end}.lmpte .lmprow input{flex:1 1 100%}}
 </style></head><body><div id="root" class="wrap"></div><dialog id="ed" aria-label="Editar"></dialog><div id="toast" role="status" aria-live="polite"></div>
 <script id="estado" type="application/json">{"version":2,"meses":["2026-10"],"metas":{"f5":44.5,"f6":45,"pt":30,"antFull":200000,"antPart":150000},"personas":[],"turnos":[],"nov":[],"notas":{},"feriados":{"2026-01-01":{"n":"Año Nuevo","cerrado":false},"2026-04-03":{"n":"Viernes Santo","cerrado":false},"2026-04-04":{"n":"Sábado Santo","cerrado":false},"2026-05-01":{"n":"Día del Trabajo","cerrado":false},"2026-05-21":{"n":"Glorias Navales","cerrado":false},"2026-06-21":{"n":"Día de los Pueblos Indígenas","cerrado":false},"2026-06-29":{"n":"San Pedro y San Pablo","cerrado":false},"2026-07-16":{"n":"Virgen del Carmen","cerrado":false},"2026-08-15":{"n":"Asunción de la Virgen","cerrado":false},"2026-09-18":{"n":"Independencia Nacional","cerrado":false},"2026-09-19":{"n":"Glorias del Ejército","cerrado":false},"2026-10-12":{"n":"Encuentro de Dos Mundos","cerrado":false},"2026-10-31":{"n":"Iglesias Evangélicas y Protestantes","cerrado":false},"2026-11-01":{"n":"Todos los Santos","cerrado":false},"2026-12-08":{"n":"Inmaculada Concepción","cerrado":false},"2026-12-25":{"n":"Navidad","cerrado":false},"2027-01-01":{"n":"Año Nuevo","cerrado":false},"2027-03-26":{"n":"Viernes Santo","cerrado":false},"2027-03-27":{"n":"Sábado Santo","cerrado":false},"2027-05-01":{"n":"Día del Trabajo","cerrado":false},"2027-05-21":{"n":"Glorias Navales","cerrado":false},"2027-06-21":{"n":"Día de los Pueblos Indígenas","cerrado":false},"2027-06-28":{"n":"San Pedro y San Pablo","cerrado":false},"2027-07-16":{"n":"Virgen del Carmen","cerrado":false},"2027-08-15":{"n":"Asunción de la Virgen","cerrado":false},"2027-09-18":{"n":"Independencia Nacional","cerrado":false},"2027-09-19":{"n":"Glorias del Ejército","cerrado":false},"2027-10-11":{"n":"Encuentro de Dos Mundos","cerrado":false},"2027-10-31":{"n":"Iglesias Evangélicas y Protestantes","cerrado":false},"2027-11-01":{"n":"Todos los Santos","cerrado":false},"2027-12-08":{"n":"Inmaculada Concepción","cerrado":false},"2027-12-25":{"n":"Navidad","cerrado":false}},"extras":[],"anticipos":[],"consumos":[],"notasMes":{},"guardado":null}</script>
 <script id="app">
@@ -488,7 +521,7 @@ function normReps(){S.nov.forEach(n=>{n.reps=n.reps||{};Object.keys(n.reps).forE
 normReps();
 const FER_BASE={"2026-01-01": "Año Nuevo", "2026-04-03": "Viernes Santo", "2026-04-04": "Sábado Santo", "2026-05-01": "Día del Trabajo", "2026-05-21": "Glorias Navales", "2026-06-21": "Día de los Pueblos Indígenas", "2026-06-29": "San Pedro y San Pablo", "2026-07-16": "Virgen del Carmen", "2026-08-15": "Asunción de la Virgen", "2026-09-18": "Independencia Nacional", "2026-09-19": "Glorias del Ejército", "2026-10-12": "Encuentro de Dos Mundos", "2026-10-31": "Iglesias Evangélicas y Protestantes", "2026-11-01": "Todos los Santos", "2026-12-08": "Inmaculada Concepción", "2026-12-25": "Navidad", "2027-01-01": "Año Nuevo", "2027-03-26": "Viernes Santo", "2027-03-27": "Sábado Santo", "2027-05-01": "Día del Trabajo", "2027-05-21": "Glorias Navales", "2027-06-21": "Día de los Pueblos Indígenas", "2027-06-28": "San Pedro y San Pablo", "2027-07-16": "Virgen del Carmen", "2027-08-15": "Asunción de la Virgen", "2027-09-18": "Independencia Nacional", "2027-09-19": "Glorias del Ejército", "2027-10-11": "Encuentro de Dos Mundos", "2027-10-31": "Iglesias Evangélicas y Protestantes", "2027-11-01": "Todos los Santos", "2027-12-08": "Inmaculada Concepción", "2027-12-25": "Navidad"};
 if(!S.feriados){S.feriados={};Object.keys(FER_BASE).forEach(d=>{S.feriados[d]={n:FER_BASE[d],cerrado:false};});}
-S.extras=S.extras||[];S.anticipos=S.anticipos||[];S.consumos=S.consumos||[];S.cerrados=S.cerrados||{};
+S.extras=S.extras||[];S.anticipos=S.anticipos||[];S.consumos=S.consumos||[];S.cerrados=S.cerrados||{};S.limpieza=S.limpieza||null;
 if(!S.notasMes){S.notasMes={};if(S.notas&&Object.keys(S.notas).length)S.notasMes[S.meses[0]]=S.notas;}
 if(S.metas.antFull==null)S.metas.antFull=200000;if(S.metas.antPart==null)S.metas.antPart=150000;
 const AUT='Autorizado por supervisor';
@@ -838,9 +871,10 @@ function respDif(st){const L=[],n=(x,a,b)=>x+' '+(x===1?a:b);
   cmp('turnos','Turnos');cmp('nov','Ausencias');cmp('extras','Horas extra');cmp('anticipos','Anticipos');cmp('consumos','Consumos');cmp('personas','Trabajadores',p=>p.n);
   const mq=S.meses.filter(m=>!st.meses.includes(m));if(mq.length)L.push('Meses que desaparecen: '+mq.map(ymName).join(', ')+'.');
   const cz=Object.keys(S.cerrados).filter(m=>!(st.cerrados||{})[m]);if(cz.length)L.push('Meses que vuelven a quedar abiertos: '+cz.map(ymName).join(', ')+'.');
+  if(JSON.stringify(S.limpieza||null)!==JSON.stringify(st.limpieza||null))L.push(st.limpieza?'Listas de limpieza: cambian.':'Listas de limpieza: se quitan.');
   return L;}
 function applyBackup(st){
-  pushUndo();S.personas=st.personas;S.turnos=st.turnos;S.meses=st.meses.sort();S.metas=Object.assign({},S.metas,st.metas||{});S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.notasMes=st.notasMes||(st.notas?{[st.meses[0]]:st.notas}:{});
+  pushUndo();S.personas=st.personas;S.turnos=st.turnos;S.meses=st.meses.sort();S.metas=Object.assign({},S.metas,st.metas||{});S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.limpieza=st.limpieza||null;S.notasMes=st.notasMes||(st.notas?{[st.meses[0]]:st.notas}:{});
   S.personas.forEach(p=>{if(!('desde' in p))p.desde=null;if(!('hasta' in p))p.hasta=null;if(!('vac' in p))p.vac=null;});S.turnos.forEach((t,i)=>{if(!t.id)t.id='t'+i;});normReps();
   if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];changed();dlg.close();toast('Respaldo cargado. Revisa y presiona Guardar para dejarlo.',true);}
 const hs=x=>x.slice(3)==='00'?x.slice(0,2):x;
@@ -898,11 +932,13 @@ const IC={hoy:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93
  undo:'<path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13"/>',
  more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',
  save:'<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/>',
+ limp:'<path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M19 14l.8 2.2 2.2.8-2.2.8L19 20l-.8-2.2-2.2-.8 2.2-.8z"/>',
+ wa:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',up:'<path d="m18 15-6-6-6 6"/>',down:'<path d="m6 9 6 6 6-6"/>',x:'<path d="M18 6 6 18M6 6l12 12"/>',
  tema:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>',
  menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',cl:'<path d="m15 18-6-6 6-6"/>',cr:'<path d="m9 18 6-6-6-6"/>'};
 const ico=k=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
-const NAV=[['hoy','Hoy','hoy'],['semana','Horario','cal'],['cierre','Cierre','clip'],['pagos','Pagos','wallet'],['persona','Personal','users']];
-const TITLES={hoy:'Hoy',semana:'Horario',resumen:'Horario',mes:'Horario',cierre:'Cierre del mes',pagos:'Anticipos y consumo',persona:'Personal'};
+const NAV=[['hoy','Hoy','hoy'],['semana','Horario','cal'],['cierre','Cierre','clip'],['pagos','Pagos','wallet'],['persona','Personal','users'],['limpieza','Limpieza','limp']];
+const TITLES={hoy:'Hoy',semana:'Horario',resumen:'Horario',mes:'Horario',cierre:'Cierre del mes',pagos:'Anticipos y consumo',persona:'Personal',limpieza:'Limpieza'};
 const navOn=v=>ui.vista===v||(v==='semana'&&(ui.vista==='resumen'||ui.vista==='mes'));
 const MQ=window.matchMedia('(max-width: 760px)');const narrow=()=>MQ.matches;
 if(MQ.addEventListener)MQ.addEventListener('change',()=>render());
@@ -915,18 +951,141 @@ function render(){index();
   const side=`<aside class="side"><div class="brand"><span class="logo">T</span><div><b>TimeOut</b><small>Horario del personal</small></div></div>
     <nav class="snav" aria-label="Secciones">${NAV.map(([v,l,k])=>`<button data-act="vista" data-v="${v}" title="${l}" class="${navOn(v)?'on':''}"${navOn(v)?' aria-current="page"':''}>${ico(k)}<span>${l}</span></button>`).join('')}</nav>
     <div class="sfoot"><button data-act="crear" title="Crear meses">${ico('calplus')}<span>Crear meses</span></button>${caps.downloads?`<button data-act="export" title="Exportar a Excel">${ico('dl')}<span>Exportar a Excel</span></button>`:''}<button data-act="resp" title="Respaldo">${ico('arch')}<span>Respaldo</span></button><button data-act="tema" title="Tema">${ico('tema')}<span>Tema: ${TEMAS[temaAct()]}</span></button><button data-act="conn" title="Conexión">${ico('users')}<span>Conexión</span></button></div></aside>`;
-  const mesnav=ui.vista==='hoy'?'':`<div class="mesnav"><button class="icon" data-act="mesmov" data-v="-1" aria-label="Mes anterior"${i<=0?' disabled':''}>${ico('cl')}</button><select data-act="mes" aria-label="Mes">${S.meses.map(m=>`<option value="${m}"${m===ui.mes?' selected':''}>${ymName(m)}${mesCerr(m)?' · cerrado':''}</option>`).join('')}</select><button class="icon" data-act="mesmov" data-v="1" aria-label="Mes siguiente"${i>=S.meses.length-1?' disabled':''}>${ico('cr')}</button></div>`;
+  const mesnav=ui.vista==='hoy'||ui.vista==='limpieza'?'':`<div class="mesnav"><button class="icon" data-act="mesmov" data-v="-1" aria-label="Mes anterior"${i<=0?' disabled':''}>${ico('cl')}</button><select data-act="mes" aria-label="Mes">${S.meses.map(m=>`<option value="${m}"${m===ui.mes?' selected':''}>${ymName(m)}${mesCerr(m)?' · cerrado':''}</option>`).join('')}</select><button class="icon" data-act="mesmov" data-v="1" aria-label="Mes siguiente"${i>=S.meses.length-1?' disabled':''}>${ico('cr')}</button></div>`;
   const top=`<header class="topbar"><div class="tl"><button class="icon sidet" data-act="sidet" aria-label="${isMini()?'Mostrar menú':'Ocultar menú'}" title="${isMini()?'Mostrar menú':'Ocultar menú'}">${ico('menu')}</button><h1>${TITLES[ui.vista]}</h1>${mesnav}</div><div class="tr">${est}<button class="icon" data-act="undo" aria-label="Deshacer" title="Deshacer"${undo.length?'':' disabled'}>${ico('undo')}</button><button class="icon mas" data-act="mas" aria-label="Más opciones">${ico('more')}</button><button class="btn pri" data-act="save" aria-label="Guardar"${loading?' disabled':''}>${ico('save')}<span>Guardar</span></button></div></header>`;
   const banner=(window.__scriptViejo?'<div class="banner"><span>Tu script de Google es de una versión anterior y la clave todavía viaja en la dirección web. Pega el Codigo.gs nuevo en script.google.com y publica una versión nueva (Implementar &gt; Gestionar implementaciones &gt; editar &gt; Nueva versión).</span></div>':'')+(window.__vacio?'<div class="banner"><span>Tu Google Drive todavía no tiene datos. Carga tu respaldo y presiona Guardar.</span><button class="btn" data-act="resp">Cargar respaldo</button></div>':'')+(window.__draftMsg?'<div class="banner"><span>Recuperamos cambios que no alcanzaste a guardar.</span><button class="btn" data-act="descartar">Descartar cambios</button></div>':'')
-    +(ui.vista!=='hoy'&&ui.vista!=='cierre'&&mesCerr(ui.mes)?`<div class="banner"><span>${esc(cerrMsg(ui.mes))}</span><button class="btn" data-act="vista" data-v="cierre">Ver cierre</button></div>`:'');
+    +(ui.vista!=='hoy'&&ui.vista!=='cierre'&&ui.vista!=='limpieza'&&mesCerr(ui.mes)?`<div class="banner"><span>${esc(cerrMsg(ui.mes))}</span><button class="btn" data-act="vista" data-v="cierre">Ver cierre</button></div>`:'');
   let sub='';
   if(ui.vista==='semana'||ui.vista==='resumen'||ui.vista==='mes'){
     sub=`<div class="subbar"><div class="seg" aria-label="Vista">${[['semana',narrow()?'Día':'Semana'],['mes','Mes'],['resumen','Resumen semanal']].map(v=>`<button data-act="vista" data-v="${v[0]}" aria-pressed="${ui.vista===v[0]}">${v[1]}</button>`).join('')}</div>`;
     if(ui.vista==='semana'||ui.vista==='mes'){sub+=`<div class="seg" aria-label="Área">${AREAS.concat(['Todas']).map(a=>`<button data-act="area" data-v="${a}" aria-pressed="${ui.area===a}">${a}</button>`).join('')}</div>`;
       if(ui.vista==='semana')sub+=`<div class="seg weeks" aria-label="Semana">${weeksOf(ui.mes).map(w=>`<button data-act="sem" data-v="${w.n}" aria-pressed="${ui.sem===w.n}">Sem ${w.n}<small>${w.lbl}</small></button>`).join('')}</div>`;}
     sub+='</div>';}
-  const body=ui.vista==='hoy'?vHoy():ui.vista==='semana'?vSemana():ui.vista==='mes'?vMes():ui.vista==='resumen'?vResumen():ui.vista==='cierre'?vCierre():ui.vista==='pagos'?vPagos():vPersona();
+  const body=ui.vista==='hoy'?vHoy():ui.vista==='semana'?vSemana():ui.vista==='mes'?vMes():ui.vista==='resumen'?vResumen():ui.vista==='cierre'?vCierre():ui.vista==='pagos'?vPagos():ui.vista==='limpieza'?vLimpieza():vPersona();
   $('#root').innerHTML=`<div class="app${isMini()?' mini':''}">${side}<div class="mainw">${top}<main class="content">${banner}${sub}${body}</main></div></div><nav class="bnav" aria-label="Secciones">${NAV.map(([v,l,k])=>`<button data-act="vista" data-v="${v}" class="${navOn(v)?'on':''}"${navOn(v)?' aria-current="page"':''}>${ico(k)}<span>${l}</span></button>`).join('')}</nav>`;}
+
+/* ---------- limpieza: listas por área; los responsables salen del horario de cada día ---------- */
+const LMP_MOM={apertura:'Apertura',durante:'Durante el servicio',cierre:'Cierre'},LMP_ORD={apertura:0,durante:1,cierre:2};
+const LMP_RESP={apertura_area:'Abre el área',cierre_area:'Cierra el área',apertura_sector:'Abre el sector',cierre_sector:'Cierra el sector',en_turno:'Todos en turno',ultimo_en_salir:'Último en salir',apoyo_cierre:'Apoyo de cierre (part time)'};
+const LMPK='limpieza-elige';
+const normN=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase().trim();
+const hm=m=>pad(Math.floor(m/60)%24)+':'+pad(m%60);
+const lmpArea=a=>S.limpieza&&S.limpieza.areas.find(x=>x.nombre===a);
+function lmpMomento(txt,resp){const t=normN(txt);
+  return t.startsWith('APERTURA')?'apertura':t.startsWith('DURANTE')?'durante':t.startsWith('CIERRE')?'cierre':resp==='en_turno'?'durante':/^apertura/.test(resp)?'apertura':'cierre';}
+/* limpieza.json -> formato guardado: bloques diarios (dia null) y semanales (dia 0 = lunes), con momento y responsable */
+function lmpImport(J){const DIA={LUNES:0,MARTES:1,MIERCOLES:2,JUEVES:3,VIERNES:4,SABADO:5,DOMINGO:6},sin=[],malos=[];
+  const areas=AREAS.map(an=>{const A=(J.areas||[]).find(x=>normN(x.nombre)===normN(an))||{};
+    const sectores=(A.sectores||[]).map(s=>({id:s.id||nid('s'),nombre:s.nombre,personas:(s.personas||[]).map(x=>{const p=S.personas.find(q=>normN(q.n)===normN(x));if(!p)sin.push(x);return p?p.n:normN(x);})}));
+    const bloques=(A.listas||[]).map(l=>({id:nid('b'),momento:lmpMomento(l.momento,l.responsable),titulo:l.momento,sector:l.sector||null,resp:l.responsable,dia:null,tareas:(l.tareas||[]).slice()}));
+    (A.semanal||[]).forEach(w=>{const d=DIA[normN(w.dia)];if(d==null){malos.push(an+' '+w.dia);return;}
+      bloques.push({id:nid('b'),momento:lmpMomento('',w.responsable),titulo:'Semanal ('+String(w.dia).toLowerCase()+')',sector:w.sector||null,resp:w.responsable,dia:d,tareas:(w.tareas||[]).slice()});});
+    return {nombre:an,sectores,bloques};});
+  return {data:{version:1,reglas:J.reglas_responsable||{},areas},sin,malos};}
+function lmpCargar(txt){let J;try{J=JSON.parse(txt);}catch(e){toast('El archivo no es un JSON válido.');return;}
+  if(!J||!Array.isArray(J.areas)){toast('El archivo no tiene listas de limpieza ("areas").');return;}
+  const r=lmpImport(J),n=r.data.areas.reduce((a,x)=>a+x.bloques.length,0);pushUndo();S.limpieza=r.data;changed();
+  toast(`Listas cargadas: ${n} bloques.`+(r.sin.length?` No encontré en el personal: ${r.sin.join(', ')}.`:'')+(r.malos.length?` Día no reconocido: ${r.malos.join(', ')}.`:'')+' Presiona Guardar para dejarlas en tu Drive.',true);}
+/* quiénes trabajan en el área ese día, con su primera entrada y última salida (sin ausencias, con reemplazos) */
+function lmpGente(a,d){if(cerrado(d))return [];const L={};
+  const add=(n,sp)=>{const x=L[n]||(L[n]={n,ini:sp[0],fin:sp[1]});x.ini=Math.min(x.ini,sp[0]);x.fin=Math.max(x.fin,sp[1]);};
+  S.personas.forEach(p=>{if(p.a!==a)return;const nv=NOVIX[p.n+'|'+d];sh(p.n,d).forEach(t=>{if(!absT(nv,t))add(p.n,span(t));});});
+  REPS.forEach(o=>{if(o.d===d&&o.a===a)add(o.p,span(o));});
+  return Object.values(L).sort((x,y)=>x.ini-y.ini||x.fin-y.fin);}
+function lmpElegido(d,a){try{return (JSON.parse(localStorage.getItem(LMPK)||'{}'))[d+'|'+a]||null;}catch(e){return null;}}
+function lmpElegir(d,a,n){try{const M=JSON.parse(localStorage.getItem(LMPK)||'{}');if(n)M[d+'|'+a]=n;else delete M[d+'|'+a];localStorage.setItem(LMPK,JSON.stringify(M));}catch(e){}}
+/* responsables según reglas_responsable; tie = empate en "último en salir" para elegir uno */
+function lmpResp(a,b,d,G,sec){const r={n:[],nota:'',tie:null};
+  const pick=(L,f)=>{if(!L.length)return[];const v=f==='ini'?Math.min(...L.map(x=>x.ini)):Math.max(...L.map(x=>x.fin));return L.filter(x=>x[f]===v).map(x=>x.n);};
+  if(!G.length){r.nota=cerrado(d)?'Feriado: el local no trabaja.':'Nadie de '+a+' tiene turno este día.';return r;}
+  const R=b.resp;
+  if(R==='apertura_area')r.n=pick(G,'ini');
+  else if(R==='cierre_area')r.n=pick(G,'fin');
+  else if(R==='en_turno')r.n=G.map(x=>x.n);
+  else if(R==='apertura_sector'||R==='cierre_sector'){const f=R==='apertura_sector'?'ini':'fin',Gs=sec?G.filter(x=>sec.personas.includes(x.n)):[];
+    if(Gs.length)r.n=pick(Gs,f);else{r.n=pick(G,f);r.nota=(sec?'Nadie de '+sec.nombre+' trabaja este día':'Sin sector')+': lo hace quien '+(f==='ini'?'abre':'cierra')+' '+a.toLowerCase()+'.';}}
+  else if(R==='ultimo_en_salir'){r.n=pick(G,'fin');if(r.n.length>1){r.tie=r.n.slice();const el=lmpElegido(d,a);if(el&&r.tie.includes(el))r.n=[el];}}
+  else if(R==='apoyo_cierre'){const pt=G.filter(x=>{const p=person(x.n);return p&&p.a===a&&cOn(p,d)==='Part';}).map(x=>x.n);
+    if(pt.length)r.n=pt;else{r.n=pick(G,'fin');r.nota='El part time no trabaja este día: lo hace quien cierra.';}}
+  else r.n=G.map(x=>x.n);
+  return r;}
+/* lista del día: bloques diarios y semanales de ese día, en orden apertura, durante, cierre */
+function lmpDia(a,d){const A=lmpArea(a);if(!A)return [];const G=lmpGente(a,d),w=dow(d),out=[];
+  A.bloques.forEach((b,i)=>{if(b.dia!=null&&b.dia!==w)return;const T=b.tareas.filter(t=>String(t).trim());if(!T.length)return;
+    const sem=b.dia!=null,base=b.titulo||LMP_MOM[b.momento];
+    const sec=b.sector?A.sectores.find(s=>s.id===b.sector):null;
+    /* tareas "Pizza: ..." de un bloque de sector sin sector fijo: cada una va a quien abre o cierra su sector */
+    if(!sec&&/_sector$/.test(b.resp)&&A.sectores.length){const G2=new Map();
+      T.forEach(t=>{const m=t.match(/^([^:]{1,30}):\s*(.+)$/),s=m&&A.sectores.find(x=>normN(x.nombre)===normN(m[1]));const k=s?s.id:'';if(!G2.has(k))G2.set(k,{s,t:[]});G2.get(k).t.push(s?cap(m[2]):t);});
+      G2.forEach(g=>out.push({b,i,sem,titulo:base+(g.s?' · '+g.s.nombre:''),r:lmpResp(a,b,d,G,g.s),tareas:g.t}));return;}
+    out.push({b,i,sem,titulo:base+(sec?' · '+sec.nombre:''),r:lmpResp(a,b,d,G,sec),tareas:T});});
+  return out.sort((x,y)=>LMP_ORD[x.b.momento]-LMP_ORD[y.b.momento]||(x.sem-y.sem)||x.i-y.i);}
+const lmpNombres=r=>r.n.length?r.n.map(tc).join(r.tie&&r.n.length>1?' o ':', '):'Sin responsable';
+function lmpTexto(a,d,L){let t=`*Limpieza ${a}*\n${cap(flong(d))} de ${d.slice(0,4)}`;
+  L.forEach(x=>{t+=`\n\n*${x.titulo}${x.sem&&!/semanal/i.test(x.titulo)?' (semanal)':''}* — ${lmpNombres(x.r)}`;x.tareas.forEach(k=>{t+='\n☐ '+k;});});
+  return t;}
+function vLimpieza(){const d=ui.lmpDia||TODAY,a=ui.lmpArea||'Cocina';
+  const nav=`<div class="dnav"><button class="icon" data-act="lmpdia" data-v="-1" aria-label="Día anterior">${ico('cl')}</button><input type="date" class="lmpfecha" data-act="lmpfecha" value="${d}" aria-label="Fecha"><button class="btn" data-act="lmpdia" data-v="0">Hoy</button><button class="icon" data-act="lmpdia" data-v="1" aria-label="Día siguiente">${ico('cr')}</button></div>`;
+  let h=`<div class="dayhead"><div><h2>${cap(flong(d))}</h2>${d===TODAY?'<span class="pill blue">Hoy</span>':''}${S.feriados[d]?`<span class="pill red">${esc(S.feriados[d].n)}</span>`:''}</div>${ui.lmpEdit?'':nav}</div>`;
+  if(!S.limpieza)return h+`<div class="card"><h3 style="margin-top:0">Listas de limpieza</h3><p class="f">Todavía no hay listas. Carga el archivo <b>limpieza.json</b> de la carpeta del proyecto: queda guardado en tu Drive junto con el resto de los datos y después lo editas aquí.</p><label class="btn pri">Cargar limpieza.json<input type="file" accept=".json,application/json" data-file="lmp" hidden></label></div>`;
+  h+=`<div class="subbar"><div class="seg" aria-label="Área">${AREAS.map(x=>`<button data-act="lmparea" data-v="${x}" aria-pressed="${x===a}">${x}</button>`).join('')}</div><button class="btn" data-act="lmpedit">${ui.lmpEdit?'Ver la lista del día':'Editar listas'}</button></div>`;
+  if(ui.lmpEdit)return h+vLmpEditor(a);
+  const L=lmpDia(a,d),G=lmpGente(a,d),url='https://wa.me/?text='+encodeURIComponent(lmpTexto(a,d,L));
+  h+=`<div class="card lmphead"><div><h3>${a}</h3><p class="muted">${G.length?G.map(x=>esc(tc(x.n))+' '+hm(x.ini)+'–'+hm(x.fin)).join(' · '):(cerrado(d)?'Feriado, el local no trabaja.':'Nadie con turno este día.')}</p></div>`+
+    (L.length?`<a class="btn pri lmpwa" href="${esc(url)}" target="_blank" rel="noopener">${ico('wa')}<span>Enviar por WhatsApp</span></a>`:'')+'</div>';
+  if(!L.length)return h+'<p class="nota">No hay tareas para este día en '+a+'.</p>';
+  let mom='';
+  L.forEach(x=>{if(x.b.momento!==mom){mom=x.b.momento;h+=`<h3 class="lmpmom">${LMP_MOM[mom]}</h3>`;}
+    const r=x.r,quien=r.tie?`<select class="lmpsel" data-act="lmpelige" data-d="${d}" data-a="${a}" aria-label="Elegir quién"><option value="">Elegir…</option>${r.tie.map(n=>`<option value="${esc(n)}"${r.n.length===1&&r.n[0]===n?' selected':''}>${esc(tc(n))}</option>`).join('')}</select><small>Salen a la misma hora: elige uno.</small>`:`<b>${esc(lmpNombres(r))}</b>`;
+    h+=`<section class="card lmpb"><header><h4>${esc(x.titulo)}</h4>${x.sem&&!/semanal/i.test(x.titulo)?`<span class="pill">Semanal · ${DIASL[x.b.dia]}</span>`:''}</header><div class="lmpr"><span class="muted">${esc(LMP_RESP[x.b.resp]||x.b.resp)}:</span> ${quien}${r.nota?`<small>${esc(r.nota)}</small>`:''}</div><ul class="lmpt">${x.tareas.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></section>`;});
+  return h;}
+function vLmpEditor(a){const A=lmpArea(a),D=(x,v)=>x===v?' selected':'';
+  const gente=S.personas.filter(p=>p.a===a&&(!p.hasta||p.hasta>=TODAY)||A.sectores.some(s=>s.personas.includes(p.n)));
+  let h=`<p class="nota">Los cambios se guardan con el resto de los datos: presiona Guardar para dejarlos en tu Drive. Cada bloque tiene un momento, un responsable y, si es semanal, el día en que toca.</p>`;
+  h+=`<div class="card lmpe"><div class="hrow"><h3>Sectores</h3><button class="btn" data-act="lmp" data-op="sadd">Agregar sector</button></div>`;
+  if(!A.sectores.length)h+='<p class="nota" style="margin:0">Sin sectores. Úsalos si un bloque lo hace quien abre o cierra un grupo de personas del área (como pizza o sushi en cocina).</p>';
+  A.sectores.forEach((s,si)=>{const extra=s.personas.filter(n=>!gente.some(p=>p.n===n));
+    h+=`<div class="lmpsec"><div class="lmprow"><input data-lmp="snombre" data-s="${si}" value="${esc(s.nombre)}" aria-label="Nombre del sector"><button class="icon" data-act="lmp" data-op="sdel" data-s="${si}" aria-label="Quitar sector ${esc(s.nombre)}" title="Quitar sector">${ico('x')}</button></div>`+
+      `<div class="lmppers">${gente.map(p=>`<label><input type="checkbox" data-lmp="spers" data-s="${si}" data-p="${esc(p.n)}"${s.personas.includes(p.n)?' checked':''}>${esc(tc(p.n))}</label>`).join('')}${extra.map(n=>`<span class="warnb">${esc(tc(n))} no está en el personal</span>`).join('')}</div></div>`;});
+  h+='</div>';
+  A.bloques.forEach((b,bi)=>{
+    h+=`<div class="card lmpe"><div class="lmpg">`+
+      `<label class="fl">Momento<select data-lmp="momento" data-b="${bi}">${Object.keys(LMP_MOM).map(k=>`<option value="${k}"${D(k,b.momento)}>${LMP_MOM[k]}</option>`).join('')}</select></label>`+
+      `<label class="fl">Día<select data-lmp="dia" data-b="${bi}"><option value=""${b.dia==null?' selected':''}>Todos los días</option>${DIASL.map((x,i)=>`<option value="${i}"${D(i,b.dia)}>Semanal: ${x}</option>`).join('')}</select></label>`+
+      `<label class="fl">Responsable<select data-lmp="resp" data-b="${bi}">${Object.keys(LMP_RESP).map(k=>`<option value="${k}"${D(k,b.resp)}>${LMP_RESP[k]}</option>`).join('')}</select></label>`+
+      (A.sectores.length?`<label class="fl">Sector<select data-lmp="sector" data-b="${bi}"><option value="">Ninguno</option>${A.sectores.map(s=>`<option value="${esc(s.id)}"${D(s.id,b.sector)}>${esc(s.nombre)}</option>`).join('')}</select></label>`:'')+
+      `</div><label class="fl">Título<input data-lmp="titulo" data-b="${bi}" value="${esc(b.titulo||'')}" placeholder="${LMP_MOM[b.momento]}"></label>`+
+      `<ol class="lmpte">${b.tareas.map((t,ti)=>`<li><div class="lmprow"><input data-lmp="tarea" data-b="${bi}" data-t="${ti}" value="${esc(t)}" aria-label="Tarea ${ti+1}" placeholder="Escribe la tarea">`+
+        `<button class="icon" data-act="lmp" data-op="tup" data-b="${bi}" data-t="${ti}" aria-label="Subir tarea"${ti?'':' disabled'}>${ico('up')}</button><button class="icon" data-act="lmp" data-op="tdown" data-b="${bi}" data-t="${ti}" aria-label="Bajar tarea"${ti<b.tareas.length-1?'':' disabled'}>${ico('down')}</button><button class="icon" data-act="lmp" data-op="tdel" data-b="${bi}" data-t="${ti}" aria-label="Borrar tarea">${ico('x')}</button></div></li>`).join('')}</ol>`+
+      `<div class="acts"><button class="btn" data-act="lmp" data-op="tadd" data-b="${bi}">Agregar tarea</button><span class="lmpsp"></span>`+
+      `<button class="icon" data-act="lmp" data-op="bup" data-b="${bi}" aria-label="Subir bloque"${bi?'':' disabled'}>${ico('up')}</button><button class="icon" data-act="lmp" data-op="bdown" data-b="${bi}" aria-label="Bajar bloque"${bi<A.bloques.length-1?'':' disabled'}>${ico('down')}</button><button class="btn" data-act="lmp" data-op="bdel" data-b="${bi}">Borrar bloque</button></div></div>`;});
+  return h+`<button class="btn pri" data-act="lmp" data-op="badd">Agregar bloque</button>`;}
+/* botones del editor */
+function lmpOp(b){const A=lmpArea(ui.lmpArea||'Cocina');if(!A)return;const op=b.dataset.op,bi=+b.dataset.b,ti=+b.dataset.t,si=+b.dataset.s;let foco=null,msg='';
+  const mv=(L,i,j)=>{if(j<0||j>=L.length)return;L.splice(j,0,L.splice(i,1)[0]);};
+  pushUndo();
+  if(op==='tadd'){A.bloques[bi].tareas.push('');foco=`[data-lmp="tarea"][data-b="${bi}"][data-t="${A.bloques[bi].tareas.length-1}"]`;}
+  else if(op==='tup')mv(A.bloques[bi].tareas,ti,ti-1);
+  else if(op==='tdown')mv(A.bloques[bi].tareas,ti,ti+1);
+  else if(op==='tdel'){A.bloques[bi].tareas.splice(ti,1);msg='Tarea borrada.';}
+  else if(op==='bup')mv(A.bloques,bi,bi-1);
+  else if(op==='bdown')mv(A.bloques,bi,bi+1);
+  else if(op==='bdel'){A.bloques.splice(bi,1);msg='Bloque borrado.';}
+  else if(op==='badd'){A.bloques.push({id:nid('b'),momento:'apertura',titulo:'',sector:null,resp:'apertura_area',dia:null,tareas:['']});foco=`[data-lmp="titulo"][data-b="${A.bloques.length-1}"]`;}
+  else if(op==='sadd'){A.sectores.push({id:nid('s'),nombre:'Nuevo sector',personas:[]});foco=`[data-lmp="snombre"][data-s="${A.sectores.length-1}"]`;}
+  else if(op==='sdel'){const s=A.sectores.splice(si,1)[0];A.bloques.forEach(x=>{if(x.sector===s.id)x.sector=null;});msg='Sector quitado.';}
+  changed();if(msg)toast(msg,true);if(foco){const el=document.querySelector(foco);if(el){el.focus();if(el.select)el.select();}}}
+/* campos del editor: los de texto no redibujan, para no perder el foco */
+function lmpCampo(t){const A=lmpArea(ui.lmpArea||'Cocina');if(!A)return;const k=t.dataset.lmp,bi=+t.dataset.b,si=+t.dataset.s;pushUndo();
+  if(k==='tarea'){A.bloques[bi].tareas[+t.dataset.t]=t.value.trim();changed(true);return;}
+  if(k==='titulo'){A.bloques[bi].titulo=t.value.trim();changed(true);return;}
+  if(k==='snombre'){A.sectores[si].nombre=t.value.trim()||A.sectores[si].nombre;changed(true);return;}
+  if(k==='momento')A.bloques[bi].momento=t.value;
+  else if(k==='dia')A.bloques[bi].dia=t.value===''?null:+t.value;
+  else if(k==='resp')A.bloques[bi].resp=t.value;
+  else if(k==='sector')A.bloques[bi].sector=t.value||null;
+  else if(k==='spers'){const s=A.sectores[si],n=t.dataset.p;s.personas=t.checked?s.personas.filter(x=>x!==n).concat([n]):s.personas.filter(x=>x!==n);}
+  changed();}
 
 const dObj=iso=>({iso,day:+iso.slice(8),dow:dow(iso),inMonth:true});
 function vHoy(){const d=ui.dia||TODAY,ym=ymOf(d);
@@ -971,10 +1130,12 @@ function vSemanaMovil(w,areas){
   return h;}
 
 /* ---------- estado y deshacer ---------- */
-const snapshot=()=>JSON.stringify({p:S.personas,t:S.turnos,m:S.metas,n:S.nov,ms:S.meses,f:S.feriados,x:S.extras,a:S.anticipos,c:S.consumos,nm:S.notasMes,z:S.cerrados});
+const snapshot=()=>JSON.stringify({p:S.personas,t:S.turnos,m:S.metas,n:S.nov,ms:S.meses,f:S.feriados,x:S.extras,a:S.anticipos,c:S.consumos,nm:S.notasMes,z:S.cerrados,l:S.limpieza});
 function pushUndo(){undo.push(snapshot());if(undo.length>30)undo.shift();}
-function restore(o){S.personas=o.p;S.turnos=o.t;S.metas=o.m;S.nov=o.n||[];normReps();S.feriados=o.f||S.feriados;S.extras=o.x||[];S.anticipos=o.a||[];S.consumos=o.c||[];S.notasMes=o.nm||S.notasMes;S.meses=o.ms||S.meses;S.cerrados=o.z||{};if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];}
-function changed(){dirty=true;try{localStorage.setItem(DKEY,JSON.stringify({base:S.guardado,data:JSON.parse(snapshot())}));}catch(e){}render();}
+function restore(o){S.personas=o.p;S.turnos=o.t;S.metas=o.m;S.nov=o.n||[];normReps();S.feriados=o.f||S.feriados;S.extras=o.x||[];S.anticipos=o.a||[];S.consumos=o.c||[];S.notasMes=o.nm||S.notasMes;S.meses=o.ms||S.meses;S.cerrados=o.z||{};if('l' in o)S.limpieza=o.l;if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];}
+function changed(sinRender){dirty=true;try{localStorage.setItem(DKEY,JSON.stringify({base:S.guardado,data:JSON.parse(snapshot())}));}catch(e){}
+  /* sinRender: al escribir en un campo no se redibuja, para no perder el foco ni el clic siguiente */
+  if(!sinRender){render();return;}const e=document.querySelector('.topbar .estado');if(e){e.className='estado dirty';e.textContent='Cambios sin guardar';}const u=document.querySelector('.topbar [data-act="undo"]');if(u)u.disabled=false;}
 function doUndo(){const x=undo.pop();if(!x)return;restore(JSON.parse(x));changed();if($('#ed').open)$('#ed').close();}
 function toast(msg,undoable){const t=$('#toast');t.innerHTML=`<span>${esc(msg)}</span>${undoable?'<button data-act="undo">Deshacer</button>':''}`;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),6000);}
 function transfer(from,to,fromIso){const tp=person(to);S.turnos.forEach(t=>{if(t.p===from&&t.d>=fromIso){t.p=to;t.a=tp.a;}});}
@@ -1360,6 +1521,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   else if(a==='sidet'){sidePref=isMini()?'full':'mini';try{localStorage.setItem('horario-menu',sidePref);}catch(e){}render();}
   else if(a==='dsel'){ui.dsel=b.dataset.v;render();}
   else if(a==='dia'){const v=+b.dataset.v;ui.dia=v===0?TODAY:addD(ui.dia||TODAY,v);render();}
+  else if(a==='lmparea'){ui.lmpArea=b.dataset.v;render();}
+  else if(a==='lmpdia'){const v=+b.dataset.v;ui.lmpDia=v===0?TODAY:addD(ui.lmpDia||TODAY,v);render();}
+  else if(a==='lmpedit'){ui.lmpEdit=!ui.lmpEdit;render();window.scrollTo(0,0);}
+  else if(a==='lmp')lmpOp(b);
   else if(a==='extnew'){F={p:'',d:ymOf(TODAY)===ui.mes?TODAY:ui.mes+'-01',s:'',e:'',m:'',err:''};extDefault();openD('ext');}
   else if(a==='nota'){F={a:b.dataset.a,txt:(S.notasMes[ui.mes]||{})[b.dataset.a]||''};openD('nota');}
   else if(a==='gosem'){ui.vista='semana';ui.area=b.dataset.a||ui.area;if(b.dataset.d){const w=weeksOf(ui.mes).find(w=>w.days.some(x=>x.iso===b.dataset.d));if(w)ui.sem=w.n;}else if(b.dataset.v)ui.sem=+b.dataset.v;render();window.scrollTo(0,0);}
@@ -1376,6 +1541,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   else if(a==='novedit'){const n=S.nov.find(x=>x.id===b.dataset.id);if(n)openNov(null,null,null,n);}
   else if(a==='descartar'){try{localStorage.removeItem(DKEY);}catch(x){}location.reload();}});
 document.addEventListener('change',e=>{const t=e.target;if(dlg.contains(t))return;
+  if(t.dataset.file==='lmp'){const f=t.files&&t.files[0];if(f)f.text().then(lmpCargar).catch(()=>toast('No se pudo leer el archivo.'));return;}
+  if(t.dataset.lmp){lmpCampo(t);return;}
+  if(t.dataset.act==='lmpfecha'){if(t.value){ui.lmpDia=t.value;render();}return;}
+  if(t.dataset.act==='lmpelige'){lmpElegir(t.dataset.d,t.dataset.a,t.value);render();return;}
   if(t.dataset.act==='psel'){ui.persona=t.value;render();}
   else if(t.dataset.act==='mes'){ui.mes=t.value;ui.sem=semHoy();render();}
   else if(t.dataset.meta2){pushUndo();S.metas[t.dataset.meta2]=t.value;changed();}
@@ -1647,7 +1816,7 @@ function api(method,body){const post=b=>fetch(CONF.url,{method:'POST',body:JSON.
     window.__scriptViejo=true;const sep=CONF.url.includes('?')?'&':'?';
     return fetch(CONF.url+sep+'key='+encodeURIComponent(CONF.key)+'&t='+Date.now()).then(x=>x.json());});}
 function applyState(st){S.personas=st.personas||[];S.turnos=st.turnos||[];S.meses=(st.meses&&st.meses.length?st.meses:S.meses).slice().sort();S.metas=Object.assign({},S.metas,st.metas||{});
-  S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};
+  S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.limpieza=st.limpieza||null;
   S.notasMes=st.notasMes||(st.notas&&Object.keys(st.notas).length?{[S.meses[0]]:st.notas}:{});S.guardado=st.guardado||null;
   S.personas.forEach(p=>{if(!('desde' in p))p.desde=null;if(!('hasta' in p))p.hasta=null;if(!('vac' in p))p.vac=null;});
   S.turnos.forEach((t,i)=>{if(!t.id)t.id='t'+i;});normReps();
