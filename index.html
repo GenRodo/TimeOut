@@ -908,7 +908,7 @@ function vPersona(){let p=person(ui.persona);if(!p||!ACT[p.n]){p=S.personas.find
   const info=[cargoOf(p)+', '+p.a+', '+cLbl(p,ui.mes).toLowerCase()];if(p.rut)info.push('RUT '+p.rut);if(p.ingreso)info.push('Ingresó el '+flong(p.ingreso)+' de '+p.ingreso.slice(0,4));
   if(p.desde)info.push('Desde el '+flong(p.desde));if(p.hasta)info.push('Hasta el '+flong(p.hasta));
   const vac=p.c==='Apoyo'?'':(p.vac==null?'Vacaciones: falta ingresar los días disponibles':`Vacaciones: ${fh(p.vac)} disponibles, ${fh(used)} usadas, saldo ${fh(p.vac-used)}`);
-  h+=`<div class="pcard"><div><h2>${esc(tc(p.n))}</h2>${p.full?`<p><b>${esc(p.full)}</b></p>`:''}<p>${esc(info.join('. '))}</p>${vac?`<p>${vac}</p>`:''}</div><div class="acts"><button class="btn" data-act="editper" data-p="${esc(p.n)}">Editar datos</button>${isVac(p.n)?`<button class="btn pri" data-act="asignar" data-p="${esc(p.n)}">Asignar a trabajador nuevo</button>`:(p.hasta?'':`<button class="btn" data-act="baja" data-p="${esc(p.n)}">Desvincular</button>`)}<button class="btn" data-act="nuevo">Agregar trabajador</button></div></div>`;
+  h+=`<div class="pcard"><div><h2>${esc(tc(p.n))}</h2>${p.full?`<p><b>${esc(p.full)}</b></p>`:''}<p>${esc(info.join('. '))}</p>${vac?`<p>${vac}</p>`:''}</div><div class="acts"><button class="btn" data-act="editper" data-p="${esc(p.n)}">Editar datos</button>${caps.downloads?`<button class="btn" data-act="pdetalle" data-p="${esc(p.n)}">${ico('dl')}Descargar detalle</button>`:''}${isVac(p.n)?`<button class="btn pri" data-act="asignar" data-p="${esc(p.n)}">Asignar a trabajador nuevo</button>`:(p.hasta?'':`<button class="btn" data-act="baja" data-p="${esc(p.n)}">Desvincular</button>`)}<button class="btn" data-act="nuevo">Agregar trabajador</button></div></div>`;
   {const z=S.cerrados[ui.mes],f=z&&z.filas.find(x=>x.n===p.n),q=f?f.q:cierre(p,ui.mes),c=f?f.c:cMes(p,ui.mes);
     const sv=f?(q.saldo==null?'Sin dato':fh(q.saldo)):(p.vac==null?'Sin dato':fh(p.vac-used));
     const items=c==='Apoyo'?[['Días de apoyo',fh(q.apoD)],['Horas de apoyo',fh(q.apoH)],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]]
@@ -1306,9 +1306,13 @@ function draw(){let h='<div class="ed">';const m=ed.mode;
     h+=`<footer><button class="btn pri" data-ed="close">Listo</button></footer>`;}
   else if(m==='xls'){h+=`<h2>Exportar a Excel</h2><p class="f">${ymName(ui.mes)}</p>`;
     h+=`<button class="it" data-ed="xlsgo" data-v="horario"><span><b>Solo el horario</b><small>Una hoja por área con los turnos de cada semana, sin cierre ni pagos.</small></span></button>`;
+    h+=`<button class="it" data-ed="xlspers"><span><b>Un trabajador</b><small>Su ficha del mes y sus turnos día a día: horario real, ausencias, reemplazos, horas extra, anticipo y consumo.</small></span></button>`;
     h+=`<button class="it" data-ed="xlsgo" data-v="cont"><span><b>Para el contador</b><small>Cierre, fichas por trabajador, anticipos, consumo, ausencias, horas extra, días libres trabajados y feriados.</small></span></button>`;
     h+=`<button class="it" data-ed="xlsgo" data-v="full"><span><b>Completo</b><small>Todo lo anterior, más el resumen semanal y el horario de cada área.</small></span></button>`;
     h+=`<footer><button class="btn" data-ed="close">Cancelar</button></footer>`;}
+  else if(m==='xlsp'){h+=`<h2>Detalle de un trabajador</h2><p class="f">${ymName(ui.mes)}. Elige a quién.</p>`;
+    AREAS.forEach(a=>{const L=inArea(a);if(!L.length)return;h+=`<h3 class="sth">${a}</h3>`+L.map(p=>`<button class="it" data-ed="xlsgo" data-v="persona" data-p="${esc(p.n)}"><span><b>${esc(tc(p.n))}</b><small>${esc(cargoOf(p))}${p.full?' · '+esc(p.full):''}</small></span></button>`).join('');});
+    h+=`<footer><button class="btn" data-ed="mexp">Volver</button><button class="btn" data-ed="close">Cancelar</button></footer>`;}
   else if(m==='conn'){h+=`<h2>Conexión con Google</h2><p class="f">Los datos se guardan en tu Google Drive mediante tu script. Esto se configura una vez en cada equipo.</p>`;
     h+=fld('Dirección del script (termina en /exec)',inp('url','text',F.url,' autocomplete="off" placeholder="https://script.google.com/macros/s/…/exec"'));
     h+=fld('Clave',inp('key','password',F.key,' autocomplete="off"'),'La misma que pusiste en el script.');
@@ -1359,7 +1363,8 @@ function openNov(p,tipo,d,existing){if(existing){F=JSON.parse(JSON.stringify(exi
 dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
   const b=e.target.closest('[data-ed]');if(!b||b.disabled)return;const a=b.dataset.ed;
   if(a==='close'){dlg.close();return;}
-  if(a==='xlsgo'){dlg.close();exportX(b.dataset.v);return;}
+  if(a==='xlsgo'){dlg.close();exportX(b.dataset.v,b.dataset.p);return;}
+  if(a==='xlspers'){openD('xlsp');return;}
   if(a==='mundo'){doUndo();return;}
   if(a==='mcrear'){F={};openD('crear');return;}
   if(a==='mexp'){openD('xls');return;}
@@ -1521,6 +1526,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   else if(a==='sidet'){sidePref=isMini()?'full':'mini';try{localStorage.setItem('horario-menu',sidePref);}catch(e){}render();}
   else if(a==='dsel'){ui.dsel=b.dataset.v;render();}
   else if(a==='dia'){const v=+b.dataset.v;ui.dia=v===0?TODAY:addD(ui.dia||TODAY,v);render();}
+  else if(a==='pdetalle')exportX('persona',b.dataset.p);
   else if(a==='lmparea'){ui.lmpArea=b.dataset.v;render();}
   else if(a==='lmpdia'){const v=+b.dataset.v;ui.lmpDia=v===0?TODAY:addD(ui.lmpDia||TODAY,v);render();}
   else if(a==='lmpedit'){ui.lmpEdit=!ui.lmpEdit;render();window.scrollTo(0,0);}
@@ -1626,7 +1632,7 @@ const XW=(()=>{
     return zip(files);};
   return {Book};})();
 
-function buildWorkbook(ym,mode){
+function buildWorkbook(ym,mode,pn){
   const W=weeksOf(ym),B=new XW.Book(),r2=x=>Math.round(x*100)/100,tv=t=>mins(t)/1440,X=Object.assign,FI=cierreFilas(ym);
   const BLUE='1F3864';
   const ST={title:{b:1,sz:16,color:BLUE},sub:{sz:9,color:'595959'},
@@ -1638,9 +1644,10 @@ function buildWorkbook(ym,mode){
   const title=(s,txt,cols,sub)=>{s.set(0,0,txt,ST.title);s.merge(0,0,0,cols-1);s.heights[0]=26;if(sub)s.set(1,0,sub,ST.sub);};
   const gen='Generado el '+new Date().toLocaleString('es-CL',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});
   const solo=mode==='horario';  /* "Solo el horario": únicamente las hojas de horario de cada área */
+  const uno=mode==='persona'?pn:null;  /* detalle de un trabajador: su ficha y sus turnos del mes */
 
   /* Cierre */
-  if(!solo){const s=B.sheet('Cierre'),nc=CCOLS.length+3;title(s,'Cierre de '+ymName(ym),nc,S.cerrados[ym]?'Mes cerrado el '+cerrFecha(ym,1)+'. '+gen:gen);
+  if(!solo&&!uno){const s=B.sheet('Cierre'),nc=CCOLS.length+3;title(s,'Cierre de '+ymName(ym),nc,S.cerrados[ym]?'Mes cerrado el '+cerrFecha(ym,1)+'. '+gen:gen);
     let r=3;['Área','Trabajador','Contrato'].concat(CCOLS.map(c=>c[1])).forEach((h,c)=>s.set(r,c,h,ST.hdr));s.heights[r]=42;
     s.width(0,10);s.width(1,18);s.width(2,12);CCOLS.forEach((_,i)=>s.width(i+3,11));s.freeze={r:4,c:2};r++;
     AREAS.forEach(a=>{s.set(r,0,a,ST.grp);for(let c=1;c<nc;c++)s.set(r,c,'',ST.grp);s.merge(r,0,r,nc-1);r++;
@@ -1653,7 +1660,7 @@ function buildWorkbook(ym,mode){
     r++;s.set(r,0,'Días a pagar: base de '+(S.metas.base==='mes'?'los días del mes':'30 días')+', menos permisos sin goce y licencias (desde el ingreso o hasta la salida si fue en el mes). Vacaciones y feriados no se descuentan; las fallas se descuentan en horas.',ST.sub);}
 
   /* Anticipos */
-  if(!solo){const s=B.sheet('Anticipos'),H=['Nombre','Cargo','RUT','Fecha','Monto solicitado','Observaciones'],M={sz:9,bd:1,h:'right',fmt:'"$"#,##0'};title(s,'Anticipos, '+ymName(ym),H.length,'Máximo: full time '+money(S.metas.antFull)+', part time '+money(S.metas.antPart)+'. Un anticipo por persona al mes.');
+  if(!solo&&!uno){const s=B.sheet('Anticipos'),H=['Nombre','Cargo','RUT','Fecha','Monto solicitado','Observaciones'],M={sz:9,bd:1,h:'right',fmt:'"$"#,##0'};title(s,'Anticipos, '+ymName(ym),H.length,'Máximo: full time '+money(S.metas.antFull)+', part time '+money(S.metas.antPart)+'. Un anticipo por persona al mes.');
     let r=3;H.forEach((h,c)=>s.set(r,c,h,ST.hdr));[20,14,14,12,16,30].forEach((w,c)=>s.width(c,w));r++;
     const A=S.anticipos.filter(a=>a.ym===ym).sort((a,b)=>{const pa=person(a.p),pb=person(b.p);return AREAS.indexOf(pa&&pa.a)-AREAS.indexOf(pb&&pb.a)||(a.p<b.p?-1:1);});
     if(!A.length)s.set(r,0,'No hay anticipos este mes.',ST.sub);
@@ -1661,7 +1668,7 @@ function buildWorkbook(ym,mode){
     if(A.length){s.set(r,0,'Total anticipos',X({},ST.l,{b:1}));for(let c=1;c<4;c++)s.set(r,c,'',ST.l);s.set(r,4,A.reduce((x,a)=>x+a.monto,0),X({},M,{b:1,fill:'FCE4D6'}));s.set(r,5,'',ST.l);}}
 
   /* Consumo */
-  if(!solo){const s=B.sheet('Consumo'),M={sz:9,bd:1,h:'right',fmt:'"$"#,##0'},MB=X({},M,{b:1,fill:'FCE4D6'});title(s,'Consumo del personal, '+ymName(ym),7,'EXPRESS FOOD con 20% de descuento sobre el consumo (el delivery no se descuenta). NOVU sin descuento.');
+  if(!solo&&!uno){const s=B.sheet('Consumo'),M={sz:9,bd:1,h:'right',fmt:'"$"#,##0'},MB=X({},M,{b:1,fill:'FCE4D6'});title(s,'Consumo del personal, '+ymName(ym),7,'EXPRESS FOOD con 20% de descuento sobre el consumo (el delivery no se descuenta). NOVU sin descuento.');
     [12,20,15,12,12,12,12].forEach((w,c)=>s.width(c,w));let r=3;
     const C=S.consumos.filter(c=>ymOf(c.d)===ym).sort((a,b)=>a.p<b.p?-1:a.p>b.p?1:a.d<b.d?-1:1);
     if(!C.length)s.set(r,0,'No hay consumos este mes.',ST.sub);
@@ -1676,9 +1683,9 @@ function buildWorkbook(ym,mode){
         s.set(r,3,k.m,M);s.set(r,4,k.desc?-k.desc:'',X({},M,{color:'006100'}));s.set(r,5,k.dl||'',M);s.set(r,6,k.tot,MB);r++;});}}
 
   /* Fichas por trabajador */
-  if(!solo){const s=B.sheet('Fichas');s.breaks=[];[26,14,3,26,14].forEach((w,c)=>s.width(c,w));let r=0;
+  if(!solo){const s=B.sheet(uno?'Ficha':'Fichas');s.breaks=[];[26,14,3,26,14].forEach((w,c)=>s.width(c,w));let r=0;
     const L={sz:10,bd:1},V={sz:10,bd:1,h:'right',b:1},MON={sz:10,bd:1,h:'right',b:1,fmt:'"$"#,##0'},HI={fill:'FCE4D6'};
-    AREAS.forEach(a=>FI.filter(f=>f.a===a).forEach(f=>{const q=f.q,ap=f.c==='Apoyo',saldo=q.saldo==null?'Sin dato':r2(q.saldo);
+    AREAS.forEach(a=>FI.filter(f=>f.a===a&&(!uno||f.n===uno)).forEach(f=>{const q=f.q,ap=f.c==='Apoyo',saldo=q.saldo==null?'Sin dato':r2(q.saldo);
       s.set(r,0,f.full||tc(f.n),{b:1,sz:16,color:BLUE});s.merge(r,0,r,4);s.heights[r]=26;r++;
       s.set(r,0,'Ficha de '+ymName(ym)+(f.ingreso?'. Ingreso: '+fdate(f.ingreso)+' '+f.ingreso.slice(0,4):''),ST.sub);r+=2;
       [['Cargo',f.cargo],['Área',f.a],['Contrato',f.cl],['RUT',f.rut||'Falta RUT']].forEach(([k,v],i)=>{const rr=r+Math.floor(i/2),c=(i%2)*3;s.set(rr,c,k,X({},L,{fill:'EDEDED',b:1}));s.set(rr,c+1,v,X({},L,k==='RUT'&&!f.rut?{color:'C00000',b:1}:{}));});r+=3;
@@ -1691,8 +1698,40 @@ function buildWorkbook(ym,mode){
         if(g){s.set(r+i,3,g[0],L);s.set(r+i,4,typeof g[1]==='number'?r2(g[1]):g[1],g[3]?MON:V);}}
       r+=n+1;s.breaks.push(r);r++;}));}
 
+  /* Turnos de un trabajador, día a día */
+  if(uno){const p=person(uno),s=B.sheet('Turnos'),H=['Fecha','Tipo','Entrada','Salida','Horas','Entró','Salió','Diferencia','Novedad','Detalle'],NC=H.length;
+    title(s,'Turnos de '+(p&&p.full||tc(uno))+', '+ymName(ym),NC,gen);
+    let r=3;H.forEach((h,c)=>s.set(r,c,h,ST.hdr));s.heights[r]=30;[12,12,8,8,7,8,8,22,18,30].forEach((w,c)=>s.width(c,w));s.freeze={r:4,c:1};r++;
+    const tot={c:0,ap:0,apoyo:0,rep:0,ext:0},TP={c:'Contrato',ap:'Apertura',apoyo:'Apoyo',rep:'Reemplazo',ext:'Horas extra',libre:'Libre'},T=x=>X({},ST.c,{fmt:'h:mm'});
+    W.forEach(w=>{const st=stats(p,w);s.set(r,0,'Semana '+w.n+' · '+w.lbl+' · '+fh(st.h)+' h de contrato'+(st.meta?' ('+st.meta+')':''),ST.grp);for(let c=1;c<NC;c++)s.set(r,c,'',ST.grp);s.merge(r,0,r,NC-1);r++;
+      w.days.forEach(dd=>{if(!dd.inMonth)return;const d=dd.iso,nv=NOVIX[uno+'|'+d],cz=cerrado(d),fe=S.feriados[d],F=[];
+        sh(uno,d).forEach(t=>F.push({k:t.t,t,s:t.s,e:t.e}));
+        (REPIX[uno+'|'+d]||[]).forEach(o=>F.push({k:'rep',s:o.s,e:o.e,det:'Cubre a '+tc(o.de)+' ('+PAGO[o.pago]+')'}));
+        (EXIX[uno+'|'+d]||[]).forEach(x=>F.push({k:'ext',s:x.s,e:x.e,det:x.m||''}));
+        F.sort((a,b)=>span(a)[0]-span(b)[0]);if(!F.length)F.push({k:'libre'});
+        F.forEach((f,i)=>{const t=f.t,abs=!!t&&(cz||absT(nv,t)),fill=f.k==='rep'||f.k==='ext'||f.k==='apoyo'?tf(f.k,ST.c):f.k==='ap'?X({},ST.c,{fill:'EDEDED'}):f.k==='libre'?X({},ST.c,{color:'808080'}):ST.c;
+          s.set(r,0,i?'':fdate(d),X({},ST.l,{b:1}));s.set(r,1,TP[f.k]||f.k,fill);
+          if(f.k==='libre'){for(let c=2;c<8;c++)s.set(r,c,'',ST.c);}
+          else{const x=t&&(f.k==='ap'||f.k==='apoyo')?dT(t):dur(f.s,f.e);  /* como en el cierre: contrato planificado; apertura y apoyo con el horario real si está */
+            s.set(r,2,tv(f.s),T());s.set(r,3,tv(f.e),T());s.set(r,4,abs?'':r2(x),abs?ST.c:X({},ST.c,{b:1}));if(!abs)tot[f.k]+=x;
+            s.set(r,5,t&&t.rs?tv(t.rs):'',T());s.set(r,6,t&&t.re?tv(t.re):'',T());
+            let dif='';if(t&&(t.rs||t.re)&&!abs){const q=realDiff(t),L=[];if(q.atr)L.push('Atraso '+mm(q.atr));if(q.sal)L.push('Salida anticipada '+mm(q.sal));if(q.ext)L.push(fh(q.ext/60)+' h extra');dif=L.join(', ');}
+            s.set(r,7,dif,dif?X({},ST.l,{color:'9C0006'}):ST.l);}
+          let nov='',nst=ST.c;
+          if(cz&&f.k!=='libre'){nov='Feriado no trabajado';nst=tf('cer',ST.c);}
+          else if(nv&&(abs||f.k==='libre')&&nv.tipo!=='atr'){nov=TIPOS[nv.tipo];nst=tf(nv.tipo,ST.c);}
+          else if(nv&&nv.tipo==='atr'&&i===0){nov='Atraso '+(nv.min||0)+' min';nst=tf('atr',ST.c);}
+          s.set(r,8,nov,nst);s.set(r,9,[fe&&i===0?fe.n:'',f.det||''].filter(Boolean).join('. '),ST.l);r++;});});});
+    r++;const RES=[['Horas de contrato (planificadas, sin ausencias)',tot.c],['Horas de apertura',tot.ap],['Horas de apoyo',tot.apoyo],['Horas cubriendo turnos',tot.rep],['Horas extra registradas',tot.ext]].filter((x,i)=>i<2||x[1]);
+    s.set(r,0,'Resumen del mes',ST.hdr);for(let c=1;c<5;c++)s.set(r,c,'',ST.hdr);s.merge(r,0,r,4);r++;
+    RES.forEach(([k,v])=>{s.set(r,0,k,ST.l);for(let c=1;c<4;c++)s.set(r,c,'',ST.l);s.merge(r,0,r,3);s.set(r,4,r2(v),ST.tot);r++;});
+    const AN=S.anticipos.filter(a=>a.p===uno&&a.ym===ym),CO=S.consumos.filter(c=>c.p===uno&&ymOf(c.d)===ym).sort((a,b)=>a.d<b.d?-1:1),M={sz:9,bd:1,h:'right',fmt:'"$"#,##0'};
+    if(AN.length||CO.length){r++;s.set(r,0,'Anticipos y consumo',ST.hdr);for(let c=1;c<5;c++)s.set(r,c,'',ST.hdr);s.merge(r,0,r,4);r++;
+      AN.forEach(a=>{s.set(r,0,fdate(a.fecha),ST.c);s.set(r,1,'Anticipo',ST.l);s.set(r,2,a.obs||'',ST.l);s.merge(r,2,r,3);s.set(r,3,'',ST.l);s.set(r,4,a.monto,M);r++;});
+      CO.forEach(c=>{s.set(r,0,fdate(c.d),ST.c);s.set(r,1,'Consumo',ST.l);s.set(r,2,LOCAL[c.local]||c.local,ST.l);s.merge(r,2,r,3);s.set(r,3,'',ST.l);s.set(r,4,consCalc(c).tot,M);r++;});}}
+
   /* Resumen semanal */
-  if(mode!=='cont'&&!solo){const s=B.sheet('Resumen semanal'),nc=W.length+6;title(s,'Horas de contrato por semana, '+ymName(ym),nc,'Sin aperturas. Metas: full time '+fh(S.metas.f5)+' h (5 días) o '+fh(S.metas.f6)+' h (6 días); part time máximo '+fh(S.metas.pt)+' h.');
+  if(mode!=='cont'&&!solo&&!uno){const s=B.sheet('Resumen semanal'),nc=W.length+6;title(s,'Horas de contrato por semana, '+ymName(ym),nc,'Sin aperturas. Metas: full time '+fh(S.metas.f5)+' h (5 días) o '+fh(S.metas.f6)+' h (6 días); part time máximo '+fh(S.metas.pt)+' h.');
     let r=3;['Área','Trabajador','Contrato'].concat(W.map(w=>'Sem '+w.n+'\n'+w.lbl)).concat(['Contrato mes','Aperturas','Total']).forEach((h,c)=>s.set(r,c,h,ST.hdr));s.heights[r]=30;
     s.width(0,10);s.width(1,18);s.width(2,12);for(let c=3;c<nc;c++)s.width(c,11);s.freeze={r:4,c:2};r++;
     AREAS.forEach(a=>{s.set(r,0,a,ST.grp);for(let c=1;c<nc;c++)s.set(r,c,'',ST.grp);s.merge(r,0,r,nc-1);r++;
@@ -1702,7 +1741,7 @@ function buildWorkbook(ym,mode){
     r++;[['ok','En la meta / dentro del máximo'],['over','Sobre la meta o el máximo'],['under','Bajo la meta o días distintos a 5 o 6']].forEach(([k,t])=>{s.set(r,1,'',X({},ST.c,{fill:SF[k][0]}));s.set(r,2,t,ST.sub);r++;});}
 
   /* Ausencias */
-  if(!solo){const s=B.sheet('Ausencias'),H=['Trabajador','Tipo','Desde','Hasta','Días','Horas falla','Turno','Reemplazo','Pago','Entró','Salió','Horas reemplazo'];title(s,'Ausencias y reemplazos, '+ymName(ym),H.length);
+  if(!solo&&!uno){const s=B.sheet('Ausencias'),H=['Trabajador','Tipo','Desde','Hasta','Días','Horas falla','Turno','Reemplazo','Pago','Entró','Salió','Horas reemplazo'];title(s,'Ausencias y reemplazos, '+ymName(ym),H.length);
     let r=3;H.forEach((h,c)=>s.set(r,c,h,ST.hdr));s.heights[r]=30;[18,16,11,11,7,9,20,18,13,8,8,11].forEach((w,c)=>s.width(c,w));s.freeze={r:4,c:1};r++;
     const L=S.nov.filter(n=>ymOf(n.d1)<=ym&&ymOf(n.d2)>=ym).sort((a,b)=>a.d1<b.d1?-1:1);
     if(!L.length)s.set(r,0,'No hay ausencias registradas este mes.',ST.sub);
@@ -1716,7 +1755,7 @@ function buildWorkbook(ym,mode){
         r++;});});}
 
   /* Horas extra */
-  if(!solo){const s=B.sheet('Horas extra'),H=['Trabajador','Área','Fecha','Desde','Hasta','Horas','Detalle'];title(s,'Horas extra, '+ymName(ym),H.length,'Incluye horas extra registradas y reemplazos pagados como horas extra.');
+  if(!solo&&!uno){const s=B.sheet('Horas extra'),H=['Trabajador','Área','Fecha','Desde','Hasta','Horas','Detalle'];title(s,'Horas extra, '+ymName(ym),H.length,'Incluye horas extra registradas y reemplazos pagados como horas extra.');
     let r=3;H.forEach((h,c)=>s.set(r,c,h,ST.hdr));[18,11,16,8,8,8,34].forEach((w,c)=>s.width(c,w));s.freeze={r:4,c:1};r++;
     const XL=[];S.extras.filter(x=>ymOf(x.d)===ym).forEach(x=>XL.push({p:x.p,d:x.d,s:x.s,e:x.e,txt:x.m||'Horas extra'}));
     realExtras(ym).forEach(x=>XL.push(x));REPS.filter(o=>ymOf(o.d)===ym&&o.pago==='extra').forEach(o=>XL.push({p:o.p,d:o.d,s:o.s,e:o.e,txt:'Reemplazo de '+tc(o.de)}));
@@ -1728,7 +1767,7 @@ function buildWorkbook(ym,mode){
     close();}
 
   /* Días libres trabajados */
-  if(!solo){const s=B.sheet('Días libres trabajados');title(s,'Días libres trabajados, '+ymName(ym),5,'Reemplazos u horas extra hechos en un día sin turno de contrato.');
+  if(!solo&&!uno){const s=B.sheet('Días libres trabajados');title(s,'Días libres trabajados, '+ymName(ym),5,'Reemplazos u horas extra hechos en un día sin turno de contrato.');
     [20,12,44,13,4].forEach((w,c)=>s.width(c,w));let r=3;
     const LD=monthDays(ym).map(d=>({d,rows:libreRows(d)})).filter(x=>x.rows.length);
     if(!LD.length)s.set(r,0,'Nadie trabajó en su día libre este mes.',ST.sub);
@@ -1739,7 +1778,7 @@ function buildWorkbook(ym,mode){
       s.set(r,0,'Total del día',X({},ST.l,{b:1}));s.set(r,1,rows.length+(rows.length===1?' persona':' personas'),ST.l);s.set(r,2,'',ST.l);s.set(r,3,r2(rows.reduce((a,x)=>a+x.h,0)),X({},ST.tot,{fill:'F8CBAD'}));r+=2;});}
 
   /* Feriados */
-  if(!solo){const s=B.sheet('Feriados');title(s,'Feriados de '+ymName(ym),5,'Un turno que pasa la medianoche se cuenta completo en el día en que empieza.');
+  if(!solo&&!uno){const s=B.sheet('Feriados');title(s,'Feriados de '+ymName(ym),5,'Un turno que pasa la medianoche se cuenta completo en el día en que empieza.');
     [20,12,44,13,4].forEach((w,c)=>s.width(c,w));let r=3;
     const FD=Object.keys(S.feriados).filter(d=>ymOf(d)===ym).sort();
     if(!FD.length)s.set(r,0,'No hay feriados este mes.',ST.sub);
@@ -1754,7 +1793,7 @@ function buildWorkbook(ym,mode){
 
   /* Áreas, con el formato del horario original */
   const SHORT={falla:'Falla',atr:'Atraso',vac:'Vac.',psg:'Permiso',lic:'Licencia'};
-  if(mode!=='cont')AREAS.forEach(a=>{const s=B.sheet(a),NC=25;title(s,ymName(ym)+' – '+a,NC);
+  if(mode!=='cont'&&!uno)AREAS.forEach(a=>{const s=B.sheet(a),NC=25;title(s,ymName(ym)+' – '+a,NC);
     s.width(0,17);s.width(1,10);s.width(2,8);for(let i=0;i<7;i++){s.width(3+3*i,7);s.width(4+3*i,7);s.width(5+3*i,6);}s.width(24,7);s.freeze={c:3};
     let r=2;
     W.forEach(w=>{const anyFer=w.days.some(d=>d.inMonth&&S.feriados[d.iso]);
@@ -1797,10 +1836,10 @@ function buildWorkbook(ym,mode){
     [['E2EFDA','Turno de contrato'],['BFBFBF','Apertura (fuera de contrato)'],['FFFF00','Vacante'],['DCF0E1','Apoyo'],['F7E0EC','Reemplazo (cubre a otro)'],['FFE7CC','Horas extra'],['FFC7CE','Falla'],['C6EFCE','Vacaciones'],['FFEB9C','Permiso sin goce o licencia'],['D9D9D9','Feriado no trabajado'],['FDE9D9','Feriado']].forEach(([f,t])=>{s.set(r,0,'',{bd:1,fill:f});s.set(r,1,t,ST.sub);r++;});});
   return B.build();}
 
-function exportX(mode){if(!caps.downloads)return;let data;
-  try{data=buildWorkbook(ui.mes,mode);}catch(e){toast('No se pudo armar el Excel: '+e.message);return;}
+function exportX(mode,pn){if(!caps.downloads)return;let data;
+  try{data=buildWorkbook(ui.mes,mode,pn);}catch(e){toast('No se pudo armar el Excel: '+e.message);return;}
   const ym=ui.mes;
-  caps.downloads.save({filename:(mode==='horario'?'Turnos_':'Horario_')+MESES[+ym.slice(5,7)-1]+'_'+ym.slice(0,4)+(mode==='cont'?'_contador':'')+'.xlsx',data:new Blob([data])}).catch(e=>{const c=e&&e.code;
+  caps.downloads.save({filename:(mode==='persona'?'Detalle_'+tc(pn).replace(/\s+/g,'_')+'_':mode==='horario'?'Turnos_':'Horario_')+MESES[+ym.slice(5,7)-1]+'_'+ym.slice(0,4)+(mode==='cont'?'_contador':'')+'.xlsx',data:new Blob([data])}).catch(e=>{const c=e&&e.code;
     if(c==='declined')return;if(c==='rate_limited'){toast('Ya hay una descarga esperando tu confirmación.');return;}
     caps.downloads=null;render();toast('La descarga no está disponible en esta vista.');});}
 
