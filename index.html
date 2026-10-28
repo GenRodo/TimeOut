@@ -1687,8 +1687,12 @@ function buildWorkbook(ym,mode,pn){
     const L={sz:10,bd:1},V={sz:10,bd:1,h:'right',b:1},MON={sz:10,bd:1,h:'right',b:1,fmt:'"$"#,##0'},HI={fill:'FCE4D6'};
     AREAS.forEach(a=>FI.filter(f=>f.a===a&&(!uno||f.n===uno)).forEach(f=>{const q=f.q,ap=f.c==='Apoyo',saldo=q.saldo==null?'Sin dato':r2(q.saldo);
       s.set(r,0,f.full||tc(f.n),{b:1,sz:16,color:BLUE});s.merge(r,0,r,4);s.heights[r]=26;r++;
-      s.set(r,0,'Ficha de '+ymName(ym)+(f.ingreso?'. Ingreso: '+fdate(f.ingreso)+' '+f.ingreso.slice(0,4):''),ST.sub);r+=2;
-      [['Cargo',f.cargo],['Área',f.a],['Contrato',f.cl],['RUT',f.rut||'Falta RUT']].forEach(([k,v],i)=>{const rr=r+Math.floor(i/2),c=(i%2)*3;s.set(rr,c,k,X({},L,{fill:'EDEDED',b:1}));s.set(rr,c+1,v,X({},L,k==='RUT'&&!f.rut?{color:'C00000',b:1}:{}));});r+=3;
+      const pp=person(f.n),hasta=pp&&pp.hasta,desde=pp&&pp.desde,fy=x=>fdate(x)+' '+x.slice(0,4);
+      s.set(r,0,'Ficha de '+ymName(ym)+(f.ingreso?'. Ingreso: '+fy(f.ingreso):'')+(hasta?'. Desvinculado: último día '+fy(hasta):''),ST.sub);r+=2;
+      const INFO=[['Cargo',f.cargo],['Área',f.a],['Contrato',f.cl],['RUT',f.rut||'Falta RUT']];
+      if(desde&&ymOf(desde)===ym)INFO.push(['Primer día',fy(desde)]);
+      if(hasta)INFO.push(['Último día (desvinculado)',fy(hasta)]);
+      INFO.forEach(([k,v],i)=>{const rr=r+Math.floor(i/2),c=(i%2)*3,rojo=(k==='RUT'&&!f.rut)||/^Último/.test(k);s.set(rr,c,k,X({},L,{fill:'EDEDED',b:1}));s.set(rr,c+1,v,X({},L,rojo?{color:'C00000',b:1}:{}));});r+=Math.ceil(INFO.length/2)+1;
       const left=ap?[['Días de apoyo',q.apoD],['Horas de apoyo',q.apoH]]:[['Días a pagar',q.pagar,1],['Días trabajados',q.trabD],['Horas trabajadas',q.trabH,f.c==='Part'],['Horas de apertura',q.ap],['Horas extra',q.extra],['Horas cubriendo turnos',q.cubre],['Días libres trabajados',q.libres],['Horas en días libres',q.libH],['Feriados trabajados (días)',q.ferD],['Feriados trabajados (h)',q.fer]];
       const right=(ap?[]:[['Fallas (h a descontar)',q.fallaH],['Atrasos (min)',q.atr],['Salidas anticipadas (min)',q.sal],['Vacaciones (días)',q.vac],['Saldo vacaciones',saldo],['Permiso sin goce (días)',q.psg],['Licencia (días)',q.lic]]).concat([['Anticipo',q.antic,0,1],['Consumo',q.cons,0,1]]);
       s.set(r,0,'Asistencia',ST.hdr);s.set(r,1,'',ST.hdr);s.merge(r,0,r,1);s.set(r,3,'Descuentos y pagos',ST.hdr);s.set(r,4,'',ST.hdr);s.merge(r,3,r,4);r++;
@@ -1696,32 +1700,39 @@ function buildWorkbook(ym,mode,pn){
       for(let i=0;i<n;i++){const l=left[i],g=right[i];
         if(l){s.set(r+i,0,l[0],X({},L,l[2]?HI:{}));s.set(r+i,1,typeof l[1]==='number'?r2(l[1]):l[1],X({},V,l[2]?HI:{}));}
         if(g){s.set(r+i,3,g[0],L);s.set(r+i,4,typeof g[1]==='number'?r2(g[1]):g[1],g[3]?MON:V);}}
-      r+=n+1;s.breaks.push(r);r++;}));}
+      r+=n+1;
+      const NV=S.nov.filter(x=>x.p===f.n&&ymOf(x.d1)<=ym&&ymOf(x.d2)>=ym).sort((a,b)=>a.d1<b.d1?-1:1);
+      if(NV.length){s.set(r,0,'Ausencias del mes',ST.hdr);for(let c=1;c<5;c++)s.set(r,c,'',ST.hdr);s.merge(r,0,r,4);r++;
+        NV.forEach(x=>{const cant=x.tipo==='atr'?(x.min||0)+' min':x.tipo==='falla'?r2(fallaH(x))+' h':novDays(x,ym)+(novDays(x,ym)===1?' día':' días');
+          s.set(r,0,TIPOS[x.tipo],tf(x.tipo,X({},L,{b:1})));s.set(r,1,x.d1===x.d2?fy(x.d1):'Del '+fy(x.d1)+' al '+fy(x.d2),L);s.set(r,2,'',L);s.set(r,3,'',L);s.merge(r,1,r,3);s.set(r,4,cant,V);r++;});
+        r++;}
+      s.breaks.push(r);r++;}));}
 
   /* Turnos de un trabajador, día a día */
   if(uno){const p=person(uno),s=B.sheet('Turnos'),H=['Fecha','Tipo','Entrada','Salida','Horas','Entró','Salió','Diferencia','Novedad','Detalle'],NC=H.length;
-    title(s,'Turnos de '+(p&&p.full||tc(uno))+', '+ymName(ym),NC,gen);
+    title(s,'Turnos de '+(p&&p.full||tc(uno))+', '+ymName(ym),NC,(p&&p.hasta?'Desvinculado: último día '+fdate(p.hasta)+' '+p.hasta.slice(0,4)+'. ':'')+gen);
     let r=3;H.forEach((h,c)=>s.set(r,c,h,ST.hdr));s.heights[r]=30;[12,12,8,8,7,8,8,22,18,30].forEach((w,c)=>s.width(c,w));s.freeze={r:4,c:1};r++;
-    const tot={c:0,ap:0,apoyo:0,rep:0,ext:0},TP={c:'Contrato',ap:'Apertura',apoyo:'Apoyo',rep:'Reemplazo',ext:'Horas extra',libre:'Libre'},T=x=>X({},ST.c,{fmt:'h:mm'});
+    const tot={c:0,ap:0,apoyo:0,rep:0,ext:0},TP={c:'Contrato',ap:'Apertura',apoyo:'Apoyo',rep:'Reemplazo',ext:'Horas extra',libre:'Libre',baja:'Desvinculado',antes:'Aún no ingresa'},T=x=>X({},ST.c,{fmt:'h:mm'}),SIN=['libre','baja','antes'];
     W.forEach(w=>{const st=stats(p,w);s.set(r,0,'Semana '+w.n+' · '+w.lbl+' · '+fh(st.h)+' h de contrato'+(st.meta?' ('+st.meta+')':''),ST.grp);for(let c=1;c<NC;c++)s.set(r,c,'',ST.grp);s.merge(r,0,r,NC-1);r++;
       w.days.forEach(dd=>{if(!dd.inMonth)return;const d=dd.iso,nv=NOVIX[uno+'|'+d],cz=cerrado(d),fe=S.feriados[d],F=[];
         sh(uno,d).forEach(t=>F.push({k:t.t,t,s:t.s,e:t.e}));
         (REPIX[uno+'|'+d]||[]).forEach(o=>F.push({k:'rep',s:o.s,e:o.e,det:'Cubre a '+tc(o.de)+' ('+PAGO[o.pago]+')'}));
         (EXIX[uno+'|'+d]||[]).forEach(x=>F.push({k:'ext',s:x.s,e:x.e,det:x.m||''}));
-        F.sort((a,b)=>span(a)[0]-span(b)[0]);if(!F.length)F.push({k:'libre'});
-        F.forEach((f,i)=>{const t=f.t,abs=!!t&&(cz||absT(nv,t)),fill=f.k==='rep'||f.k==='ext'||f.k==='apoyo'?tf(f.k,ST.c):f.k==='ap'?X({},ST.c,{fill:'EDEDED'}):f.k==='libre'?X({},ST.c,{color:'808080'}):ST.c;
+        F.sort((a,b)=>span(a)[0]-span(b)[0]);if(!F.length)F.push({k:p&&p.hasta&&d>p.hasta?'baja':p&&p.desde&&d<p.desde?'antes':'libre'});
+        F.forEach((f,i)=>{const t=f.t,abs=!!t&&(cz||absT(nv,t)),fill=f.k==='rep'||f.k==='ext'||f.k==='apoyo'?tf(f.k,ST.c):f.k==='ap'?X({},ST.c,{fill:'EDEDED'}):f.k==='baja'?X({},ST.c,{color:'C00000',b:1}):SIN.includes(f.k)?X({},ST.c,{color:'808080'}):ST.c;
           s.set(r,0,i?'':fdate(d),X({},ST.l,{b:1}));s.set(r,1,TP[f.k]||f.k,fill);
-          if(f.k==='libre'){for(let c=2;c<8;c++)s.set(r,c,'',ST.c);}
+          if(SIN.includes(f.k)){for(let c=2;c<8;c++)s.set(r,c,'',ST.c);}
           else{const x=t&&(f.k==='ap'||f.k==='apoyo')?dT(t):dur(f.s,f.e);  /* como en el cierre: contrato planificado; apertura y apoyo con el horario real si está */
             s.set(r,2,tv(f.s),T());s.set(r,3,tv(f.e),T());s.set(r,4,abs?'':r2(x),abs?ST.c:X({},ST.c,{b:1}));if(!abs)tot[f.k]+=x;
             s.set(r,5,t&&t.rs?tv(t.rs):'',T());s.set(r,6,t&&t.re?tv(t.re):'',T());
             let dif='';if(t&&(t.rs||t.re)&&!abs){const q=realDiff(t),L=[];if(q.atr)L.push('Atraso '+mm(q.atr));if(q.sal)L.push('Salida anticipada '+mm(q.sal));if(q.ext)L.push(fh(q.ext/60)+' h extra');dif=L.join(', ');}
             s.set(r,7,dif,dif?X({},ST.l,{color:'9C0006'}):ST.l);}
           let nov='',nst=ST.c;
-          if(cz&&f.k!=='libre'){nov='Feriado no trabajado';nst=tf('cer',ST.c);}
-          else if(nv&&(abs||f.k==='libre')&&nv.tipo!=='atr'){nov=TIPOS[nv.tipo];nst=tf(nv.tipo,ST.c);}
+          if(cz&&!SIN.includes(f.k)){nov='Feriado no trabajado';nst=tf('cer',ST.c);}
+          else if(nv&&(abs||SIN.includes(f.k))&&nv.tipo!=='atr'){nov=TIPOS[nv.tipo];nst=tf(nv.tipo,ST.c);}
           else if(nv&&nv.tipo==='atr'&&i===0){nov='Atraso '+(nv.min||0)+' min';nst=tf('atr',ST.c);}
-          s.set(r,8,nov,nst);s.set(r,9,[fe&&i===0?fe.n:'',f.det||''].filter(Boolean).join('. '),ST.l);r++;});});});
+          const hito=i?'':p&&d===p.hasta?'Último día (desvinculado)':p&&d===p.desde?'Primer día':'';
+          s.set(r,8,nov,nst);s.set(r,9,[hito,fe&&i===0?fe.n:'',f.det||''].filter(Boolean).join('. '),hito?X({},ST.l,{b:1,color:hito[0]==='Ú'?'C00000':'1F3864'}):ST.l);r++;});});});
     r++;const RES=[['Horas de contrato (planificadas, sin ausencias)',tot.c],['Horas de apertura',tot.ap],['Horas de apoyo',tot.apoyo],['Horas cubriendo turnos',tot.rep],['Horas extra registradas',tot.ext]].filter((x,i)=>i<2||x[1]);
     s.set(r,0,'Resumen del mes',ST.hdr);for(let c=1;c<5;c++)s.set(r,c,'',ST.hdr);s.merge(r,0,r,4);r++;
     RES.forEach(([k,v])=>{s.set(r,0,k,ST.l);for(let c=1;c<4;c++)s.set(r,c,'',ST.l);s.merge(r,0,r,3);s.set(r,4,r2(v),ST.tot);r++;});
