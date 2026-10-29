@@ -510,6 +510,15 @@ dialog::backdrop{background:rgba(18,19,18,.5);backdrop-filter:blur(2px)}
 .pill.rs-confirmada{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
 .pill.rs-llego{background:color-mix(in srgb,var(--sel) 14%,transparent);color:var(--sel)}
 .pill.rs-cancelada{background:var(--red-bg);color:var(--red-ink)}
+.pill.rs-no_llego{background:var(--red-bg);color:var(--red-ink)}
+.resbus{margin:0 0 12px}.resbus input{box-sizing:border-box;width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink);font:inherit}
+.ressm{margin-bottom:12px;border-color:color-mix(in srgb,var(--under) 45%,var(--line))}.ressm h3{margin:0;font-size:16px}.ressm .muted{margin:2px 0 4px}
+.ressm .resrow{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:7px 0;border-top:1px solid var(--line);font-size:14px}.ressm .resrow b{color:var(--sel)}.ressm .resrow .acts{margin-left:auto}
+.rescal{display:inline-flex;align-items:center;gap:6px;font-size:13px}.rescal .ic{width:16px;height:16px}
+.resmsg{margin-top:10px;font-size:13px;color:var(--muted)}.resmsg summary{cursor:pointer;font-weight:600}.resmsg p{margin:6px 0 0;white-space:normal}
+.respeg{margin:0 0 14px;padding:10px 12px;border:1px dashed var(--line);border-radius:12px}.respeg summary{cursor:pointer;font-weight:700;color:var(--sel)}
+.respeg textarea{box-sizing:border-box;width:100%;margin:8px 0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical}
+.respeg .hint{margin:8px 0 0}
 .resn .pill{margin:0;padding:1px 8px;font-size:11px}
 .resday .resrow{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
 .resday header+.resrow{border-top:0}
@@ -1110,12 +1119,14 @@ function lmpCampo(t){const A=lmpArea(ui.lmpArea||'Cocina');if(!A)return;const k=
   changed();}
 
 /* ---------- reservas: se anotan a mano (llegan por WhatsApp) y la app avisa antes mientras está abierta ---------- */
-const RESE={pendiente:'Pendiente',confirmada:'Confirmada',llego:'Llegó',cancelada:'Cancelada'};
+const RESE={pendiente:'Pendiente',confirmada:'Confirmada',llego:'Llegó',no_llego:'No llegó',cancelada:'Cancelada'};
 const RESAK='reservas-avisos',RESDK='reservas-avisadas';
 const RESAV=[['60,15','1 hora y 15 min antes'],['60','1 hora antes'],['30','30 min antes'],['15','15 min antes'],['','No avisar']];
 const resAvisos=()=>{try{const v=JSON.parse(localStorage.getItem(RESAK)||'null');return Array.isArray(v)?v:[60,15];}catch(e){return [60,15];}};
 const resT=r=>new Date(r.fecha+'T'+r.hora+':00').getTime();
-const resActiva=r=>r.fecha&&r.hora&&r.estado!=='cancelada'&&r.estado!=='llego';
+const resActiva=r=>r.fecha&&r.hora&&r.estado!=='cancelada'&&r.estado!=='llego'&&r.estado!=='no_llego';
+const resCalAuto=()=>{try{return localStorage.getItem('reservas-cal')==='1';}catch(e){return false;}};  /* el script ya las pasa solo a Google Calendar */
+const resSinMarcar=()=>(S.reservas||[]).filter(r=>resActiva(r)&&resT(r)+2*3600000<Date.now()).sort((a,b)=>resT(a)-resT(b));
 const resFalta=min=>min>=60?(min%60?Math.floor(min/60)+' h '+(min%60)+' min':(min/60)+' h'):min+' min';
 /* reservas que vienen dentro del aviso más largo (para el aviso arriba en la app) */
 function resProx(){const now=Date.now(),mx=Math.max(0,...resAvisos())*60000;
@@ -1142,6 +1153,8 @@ function resCal(r){const fin=new Date(resT(r)+2*3600000),f2=fin.getFullYear()+pa
   return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Reserva: '+r.nombre+(r.personas?' ('+r.personas+' pers.)':''))+'&dates='+r.fecha.replace(/-/g,'')+'T'+r.hora.replace(':','')+'00/'+f2+'&ctz=America/Santiago&details='+encodeURIComponent(det);}
 function resTel(t){let d=String(t||'').replace(/\D/g,'');if(d.length===9&&d[0]==='9')d='56'+d;else if(d.length===8)d='569'+d;return d;}
 function resWa(r){return 'https://wa.me/'+resTel(r.tel)+'?text='+encodeURIComponent(`Hola ${r.nombre}, te confirmamos tu reserva para el ${flong(r.fecha)} a las ${r.hora}`+(r.personas?` para ${r.personas} personas`:'')+'. ¡Te esperamos!');}
+function resWaRec(r){const cuando=r.fecha===TODAY?'de hoy':r.fecha===addD(TODAY,1)?'de mañana':'del '+flong(r.fecha);
+  return 'https://wa.me/'+resTel(r.tel)+'?text='+encodeURIComponent(`Hola ${r.nombre}, te recordamos tu reserva ${cuando} a las ${r.hora}`+(r.personas?` para ${r.personas} personas`:'')+'. ¡Te esperamos!');}
 const resDia=d=>d===TODAY?'Hoy · '+flong(d):d===addD(TODAY,1)?'Mañana · '+flong(d):cap(flong(d));
 function resCard(r){const ok=resActiva(r),txt=s=>esc(s).replace(/\n/g,'<br>');
   return `<div class="card resc${r.estado==='cancelada'?' rcan':''}"><div class="resh"><span class="resho">${r.hora}</span><div class="resn"><b>${esc(r.nombre)}</b><small>${r.personas?r.personas+' personas · ':''}<span class="pill rs-${r.estado}">${RESE[r.estado]||r.estado}</span></small></div></div>`+
@@ -1149,24 +1162,56 @@ function resCard(r){const ok=resActiva(r),txt=s=>esc(s).replace(/\n/g,'<br>');
     (r.tel?`<p class="resl"><span class="muted">Teléfono:</span> ${esc(r.tel)}</p>`:'')+(r.notas?`<p class="resl"><span class="muted">Notas:</span> ${txt(r.notas)}</p>`:'')+
     `<div class="acts"><button class="btn" data-act="resedit" data-id="${r.id}">Editar</button>`+
     (ok&&r.estado==='pendiente'?`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="confirmada">Confirmada</button>`:'')+
-    (ok?`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="llego">Llegó</button><button class="btn" data-act="resestado" data-id="${r.id}" data-v="cancelada">Cancelar</button>`:`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="pendiente">Reactivar</button>`)+
-    (r.tel?`<a class="btn" href="${esc(resWa(r))}" target="_blank" rel="noopener">${ico('wa')}<span>WhatsApp</span></a>`:'')+
-    (ok?`<a class="btn" href="${esc(resCal(r))}" target="_blank" rel="noopener">${ico('cal')}<span>Google Calendar</span></a>`:'')+'</div></div>';}
+    (ok?`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="llego">Llegó</button>`+(resT(r)<Date.now()?`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="no_llego">No llegó</button>`:'')+`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="cancelada">Cancelar</button>`:`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="pendiente">Reactivar</button>`)+
+    (r.tel&&ok&&r.fecha<=addD(TODAY,1)&&r.fecha>=TODAY?`<a class="btn" href="${esc(resWaRec(r))}" target="_blank" rel="noopener">${ico('wa')}<span>Recordatorio</span></a>`:'')+
+    (r.tel?`<a class="btn" href="${esc(resWa(r))}" target="_blank" rel="noopener">${ico('wa')}<span>${ok?'Confirmar':'WhatsApp'}</span></a>`:'')+
+    (ok?(resCalAuto()?`<span class="muted rescal">${ico('cal')} En tu Google Calendar</span>`:`<a class="btn" href="${esc(resCal(r))}" target="_blank" rel="noopener">${ico('cal')}<span>Google Calendar</span></a>`):'')+'</div>'+
+    (r.mensaje?`<details class="resmsg"><summary>Mensaje original</summary><p>${txt(r.mensaje)}</p></details>`:'')+'</div>';}
 function vReservas(){const L=S.reservas||[],ver=ui.resVer||'prox',av=resAvisos().join(','),N='Notification' in window?Notification.permission:'no';
   const prox=L.filter(r=>r.fecha>=TODAY);
   let h=`<div class="dayhead"><div><h2>${prox.filter(resActiva).length} ${prox.filter(resActiva).length===1?'reserva próxima':'reservas próximas'}</h2></div><button class="btn pri" data-act="resnew">${ico('plus')}<span>Nueva reserva</span></button></div>`;
   h+=`<div class="subbar"><div class="seg" aria-label="Ver">${[['prox','Próximas'],['pasadas','Pasadas']].map(([v,l])=>`<button data-act="resver" data-v="${v}" aria-pressed="${ver===v}">${l}</button>`).join('')}</div>`+
     `<label class="resav">Avisar <select data-act="resaviso" aria-label="Cuándo avisar">${RESAV.map(([v,l])=>`<option value="${v}"${v===av?' selected':''}>${l}</option>`).join('')}</select></label>`+
     (N==='default'?`<button class="btn" data-act="resnotif">Activar notificaciones</button>`:N==='denied'?'<span class="muted">Notificaciones bloqueadas en este navegador</span>':N==='granted'?'<span class="muted">Notificaciones activadas en este equipo</span>':'')+'</div>';
-  h+='<p class="nota">La app avisa mientras está abierta. Para que el celular te avise aunque esté cerrada, usa <b>Google Calendar</b> en cada reserva; en Google Calendar deja como notificación predeterminada 1 hora y 15 minutos antes.</p>';
-  const lista=(ver==='prox'?prox:L.filter(r=>r.fecha<TODAY)).slice().sort((a,b)=>{const x=a.fecha+a.hora,y=b.fecha+b.hora;return ver==='prox'?(x<y?-1:x>y?1:0):(x>y?-1:x<y?1:0);});
-  if(!lista.length)return h+`<div class="card"><p style="margin:0">${ver==='prox'?'No hay reservas próximas. Cuando te llegue una por WhatsApp, anótala con <b>Nueva reserva</b>.':'No hay reservas pasadas.'}</p></div>`;
+  h+=resCalAuto()?'<p class="nota">Al presionar Guardar, las reservas se pasan solas a tu Google Calendar con aviso 1 hora y 15 minutos antes, así el celular avisa aunque la app esté cerrada. La app también avisa mientras está abierta.</p>'
+    :'<p class="nota">La app avisa mientras está abierta. Para que el celular te avise aunque esté cerrada, usa <b>Google Calendar</b> en cada reserva; en Google Calendar deja como notificación predeterminada 1 hora y 15 minutos antes.</p>';
+  const q=normN(ui.resQ||'');
+  h+=`<div class="resbus"><input type="search" data-act="resbuscar" value="${esc(ui.resQ||'')}" placeholder="Buscar por nombre, teléfono, motivo…" aria-label="Buscar reservas"></div>`;
+  const SM=resSinMarcar();
+  if(SM.length&&!q)h+=`<section class="card ressm"><h3>${SM.length===1?'1 reserva pasada sin marcar':SM.length+' reservas pasadas sin marcar'}</h3><p class="muted">¿Llegaron?</p>${SM.map(r=>`<div class="resrow"><b>${r.hora}</b><span>${fdate(r.fecha)} · ${esc(r.nombre)}${r.personas?` · ${r.personas} pers.`:''}</span><span class="acts"><button class="btn sm" data-act="resestado" data-id="${r.id}" data-v="llego">Llegó</button><button class="btn sm" data-act="resestado" data-id="${r.id}" data-v="no_llego">No llegó</button></span></div>`).join('')}</section>`;
+  const busca=r=>normN([r.nombre,r.tel,r.motivo,r.pedido,r.notas].join(' ')).includes(q)||(q.replace(/\D/g,'').length>3&&String(r.tel||'').replace(/\D/g,'').includes(q.replace(/\D/g,'')));
+  const orden=(a,b,asc)=>{const x=a.fecha+a.hora,y=b.fecha+b.hora;return asc?(x<y?-1:x>y?1:0):(x>y?-1:x<y?1:0);};
+  const lista=q?L.filter(busca).filter(r=>r.fecha>=TODAY).sort((a,b)=>orden(a,b,1)).concat(L.filter(busca).filter(r=>r.fecha<TODAY).sort((a,b)=>orden(a,b,0)))
+    :(ver==='prox'?prox:L.filter(r=>r.fecha<TODAY)).slice().sort((a,b)=>orden(a,b,ver==='prox'));
+  if(!lista.length)return h+`<div class="card"><p style="margin:0">${q?'No encontré reservas con eso.':ver==='prox'?'No hay reservas próximas. Cuando te llegue una por WhatsApp, anótala con <b>Nueva reserva</b>.':'No hay reservas pasadas.'}</p></div>`;
   let dia='';lista.forEach(r=>{if(r.fecha!==dia){dia=r.fecha;const n=lista.filter(x=>x.fecha===dia&&x.estado!=='cancelada').reduce((a,x)=>a+(x.personas||0),0);h+=`<h3 class="lmpmom">${resDia(dia)}${n?` · ${n} personas`:''}</h3>`;}h+=resCard(r);});
   return h;}
 /* tarjeta en Hoy con las reservas del día */
 function resHoy(d){const L=(S.reservas||[]).filter(r=>r.fecha===d&&r.estado!=='cancelada').sort((a,b)=>a.hora<b.hora?-1:1);if(!L.length)return '';
   return `<section class="card acard resday"><header><h3>Reservas</h3><button class="btn sm" data-act="vista" data-v="reservas">Ver todas</button></header>${L.map(r=>`<div class="resrow"><b>${r.hora}</b><span>${esc(r.nombre)}${r.personas?` · ${r.personas} pers.`:''}${r.motivo?` · ${esc(r.motivo)}`:''}</span>${r.estado==='llego'?'<span class="pill rs-llego">Llegó</span>':''}</div>`).join('')}</section>`;}
-function openRes(id){const r=id&&(S.reservas||[]).find(x=>x.id===id);F=r?Object.assign({err:''},r,{personas:r.personas==null?'':r.personas}):{fecha:ui.resFecha||TODAY,hora:'20:00',nombre:'',personas:'',tel:'',motivo:'',pedido:'',notas:'',estado:'pendiente',err:''};openD('reserva');}
+/* intenta sacar fecha, hora, personas, teléfono, motivo y nombre de un mensaje de WhatsApp (se revisa antes de guardar) */
+function resLeer(txt){const t=(' '+normN(txt).toLowerCase().replace(/[¿?¡!,;()"]/g,' ').replace(/\.(?=\s|$)/g,' ')+' ').replace(/\s+/g,' '),o={},n=x=>({un:1,uno:1,una:1,dos:2,tres:3,cuatro:4,cinco:5,seis:6,siete:7,ocho:8,nueve:9,diez:10,once:11,doce:12,quince:15,veinte:20})[x]||+x;
+  const MES={enero:1,febrero:2,marzo:3,abril:4,mayo:5,junio:6,julio:7,agosto:8,septiembre:9,setiembre:9,octubre:10,noviembre:11,diciembre:12},DIA=['lunes','martes','miercoles','jueves','viernes','sabado','domingo'];
+  const ymd=(y,m,d)=>y+'-'+pad(m)+'-'+pad(d),y0=+TODAY.slice(0,4),fut=(m,d)=>{let f=ymd(y0,m,d);if(f<TODAY)f=ymd(y0+1,m,d);return f;};
+  let m;
+  if((m=t.match(/ (\d{1,2})\s*[\/-]\s*(\d{1,2})(?:\s*[\/-]\s*(\d{2,4}))? /))&&+m[2]>=1&&+m[2]<=12&&+m[1]>=1&&+m[1]<=31)o.fecha=m[3]?ymd(m[3].length===2?2000+ +m[3]:+m[3],+m[2],+m[1]):fut(+m[2],+m[1]);
+  else if((m=t.match(/ (\d{1,2}) de (enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|setiembre|octubre|noviembre|diciembre)/)))o.fecha=fut(MES[m[2]],+m[1]);
+  else if(/ pasado manana /.test(t))o.fecha=addD(TODAY,2);
+  else if((m=t.match(/ (proximo |este |el )?(lunes|martes|miercoles|jueves|viernes|sabado|domingo) /))){let k=(DIA.indexOf(m[2])-dow(TODAY)+7)%7;if(m[1]==='proximo '&&k===0)k=7;o.fecha=addD(TODAY,k);}
+  else if(/ manana /.test(t)&&!/ (de|en|por) la manana /.test(t))o.fecha=addD(TODAY,1);
+  else if(/ hoy /.test(t))o.fecha=TODAY;
+  else if((m=t.match(/ el (\d{1,2}) (?!personas|pers)/))&&+m[1]>=1&&+m[1]<=31){const d=+m[1],mm=+TODAY.slice(5,7);let f=ymd(y0,mm,d);if(f<TODAY)f=mm===12?ymd(y0+1,1,d):ymd(y0,mm+1,d);o.fecha=f;}
+  const tarde=!/ (de la manana|am|a m) /.test(t);let h=null,mi=0;
+  if((m=t.match(/ (\d{1,2})[:.](\d{2}) ?(am|pm|hrs?|horas)? /))){h=+m[1];mi=+m[2];if(m[3]==='pm'&&h<12)h+=12;else if(m[3]!=='am'&&tarde&&h<=11)h+=12;}
+  else if((m=t.match(/ (\d{1,2}) ?(am|pm|hrs|hr|horas|h) /))){h=+m[1];if(m[2]==='pm'&&h<12)h+=12;else if(m[2]!=='am'&&tarde&&h<=11)h+=12;}
+  else if((m=t.match(/ a las (\d{1,2}|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce) (y media|y cuarto)?/))){h=n(m[1]);mi=m[2]==='y media'?30:m[2]?15:0;if(tarde&&h<=11)h+=12;}
+  if(h!=null&&h>=0&&h<24&&mi<60)o.hora=pad(h)+':'+pad(mi);
+  if((m=t.match(/ (\d{1,3}|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|quince|veinte) (personas|persona|pers|pax|adultos|comensales|invitados) /))||(m=t.match(/ somos (\d{1,3}|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|quince|veinte) /))||(m=t.match(/ (?:mesa )?para (\d{1,3}|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|quince|veinte) (?!de |hrs|horas|am |pm |y media)/)))o.personas=n(m[1]);
+  if((m=String(txt).match(/(\+?56\s*)?9[\s.-]?\d{4}[\s.-]?\d{4}/)))o.tel=m[0].trim();
+  const MOT=[[/cumple/,'Cumpleaños'],[/aniversario/,'Aniversario'],[/despedida/,'Despedida'],[/graduacion|titulacion/,'Graduación'],[/empresa|oficina|trabajo|equipo de/,'Cena de empresa'],[/reunion/,'Reunión']].find(x=>x[0].test(t));if(MOT)o.motivo=MOT[1];
+  const NOM=String(txt).match(/(?:a nombre de|nombre de|reserva a nombre|me llamo|mi nombre es|soy)\s+([A-ZÁÉÍÓÚÑ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+){0,3})/);if(NOM)o.nombre=NOM[1];
+  return o;}
+function openRes(id){const r=id&&(S.reservas||[]).find(x=>x.id===id);F=r?Object.assign({err:''},r,{personas:r.personas==null?'':r.personas}):{fecha:ui.resFecha||TODAY,hora:'20:00',nombre:'',personas:'',tel:'',motivo:'',pedido:'',notas:'',mensaje:'',estado:'pendiente',err:'',nuevo:1};openD('reserva');}
 
 const dObj=iso=>({iso,day:+iso.slice(8),dow:dow(iso),inMonth:true});
 function vHoy(){const d=ui.dia||TODAY,ym=ymOf(d);
@@ -1417,6 +1462,7 @@ function draw(){let h='<div class="ed">';const m=ed.mode;
     h+=`<h2>Reabrir ${mes}</h2><p class="f">Se descarta el cierre guardado y ${mes} vuelve a calcularse con los datos actuales; si cambiaste metas, contratos o datos de alguien desde que lo cerraste, las cifras pueden cambiar.</p><p class="f">El mes se podrá editar de nuevo. Cuando termines, ciérralo otra vez.</p>`;
     h+=`<footer><button class="btn" data-ed="close">Cancelar</button><button class="btn pri" data-ed="reabrirok">Reabrir ${mes}</button></footer>`;}
   else if(m==='reserva'){const nuevo=!F.id;h+=`<h2>${nuevo?'Nueva reserva':'Editar reserva'}</h2><p class="f">Anota los datos que te llegaron por WhatsApp. Se guarda en tu Drive al presionar Guardar.</p>`;
+    h+=`<details class="respeg"${nuevo&&!F.info?' open':''}><summary>Pegar el mensaje de WhatsApp</summary><textarea data-k="mensaje" rows="3" placeholder="Pega aquí el mensaje del cliente">${esc(F.mensaje||'')}</textarea><button class="btn" data-ed="respegar">Completar con el mensaje</button>${F.info?`<p class="hint">${esc(F.info)}</p>`:''}</details>`;
     h+=`<div class="two">${fld('Fecha',inp('fecha','date',F.fecha))}${fld('Hora',inp('hora','time',F.hora))}</div>`;
     h+=`<div class="two">${fld('Nombre de la reserva',inp('nombre','text',F.nombre,' autocomplete="off" placeholder="Ej.: Familia Pérez"'))}${fld('Personas',inp('personas','number',F.personas,' min="1" step="1" inputmode="numeric"'))}</div>`;
     h+=fld('Teléfono (WhatsApp)',inp('tel','tel',F.tel,' placeholder="+56 9 1234 5678" autocomplete="off"'),'Para responderle por WhatsApp desde la reserva.');
@@ -1480,8 +1526,11 @@ dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
   if(a==='cerrarok'){const ym=ui.mes;pushUndo();S.cerrados[ym]={fecha:new Date().toISOString(),base:S.metas.base==='mes'?'mes':'30',filas:cierreFilas(ym)};
     changed();dlg.close();toast(ymName(ym)+' cerrado. Presiona Guardar para dejarlo en tu Drive.',true);return;}
   if(a==='reabrirok'){const ym=ui.mes;pushUndo();delete S.cerrados[ym];changed();dlg.close();toast(ymName(ym)+' reabierto: ya se puede editar.',true);return;}
+  if(a==='respegar'){const o=resLeer(F.mensaje||''),L=[];const pone=(k,lbl,forzar)=>{if(o[k]!=null&&(forzar||!String(F[k]||'').trim())){F[k]=o[k];L.push(lbl);}};
+    pone('fecha','fecha',F.nuevo);pone('hora','hora',F.nuevo);pone('personas','personas');pone('nombre','nombre');pone('tel','teléfono');pone('motivo','motivo');
+    F.info=L.length?'Completé: '+L.join(', ')+'. Revisa que esté bien antes de guardar.':'No encontré datos en el mensaje; complétalos a mano.';F.err='';draw();return;}
   if(a==='ressave'){const nm=String(F.nombre||'').trim();if(!F.fecha||!F.hora||!nm){F.err='Indica la fecha, la hora y el nombre de la reserva.';draw();return;}
-    const per=parseInt(F.personas,10),o={id:F.id||nid('r'),fecha:F.fecha,hora:F.hora,nombre:nm,personas:per>0?per:null,tel:String(F.tel||'').trim(),motivo:String(F.motivo||'').trim(),pedido:String(F.pedido||'').trim(),notas:String(F.notas||'').trim(),estado:F.estado||'pendiente',creada:F.creada||new Date().toISOString()};
+    const per=parseInt(F.personas,10),o={id:F.id||nid('r'),fecha:F.fecha,hora:F.hora,nombre:nm,personas:per>0?per:null,tel:String(F.tel||'').trim(),motivo:String(F.motivo||'').trim(),pedido:String(F.pedido||'').trim(),notas:String(F.notas||'').trim(),mensaje:String(F.mensaje||'').trim(),estado:F.estado||'pendiente',creada:F.creada||new Date().toISOString()};
     pushUndo();const i=S.reservas.findIndex(x=>x.id===o.id);if(i>=0){const pr=S.reservas[i];if(pr.fecha!==o.fecha||pr.hora!==o.hora)resOlvidar(o.id);S.reservas[i]=o;}else S.reservas.push(o);
     changed();dlg.close();toast('Reserva de '+nm+' guardada. Presiona Guardar para dejarla en tu Drive.',true);return;}
   if(a==='resdel'){pushUndo();S.reservas=S.reservas.filter(x=>x.id!==F.id);changed();dlg.close();toast('Reserva borrada.',true);return;}
@@ -1658,6 +1707,8 @@ document.addEventListener('change',e=>{const t=e.target;if(dlg.contains(t))retur
   else if(t.dataset.act==='mes'){ui.mes=t.value;ui.sem=semHoy();render();}
   else if(t.dataset.meta2){pushUndo();S.metas[t.dataset.meta2]=t.value;changed();}
   else if(t.dataset.meta){const v=parseFloat(String(t.value).replace(',','.'));if(isNaN(v))return;pushUndo();S.metas[t.dataset.meta]=v;changed();}});
+document.addEventListener('input',e=>{const t=e.target;if(t.dataset.act!=='resbuscar'||dlg.contains(t))return;ui.resQ=t.value;render();
+  const i=document.querySelector('[data-act="resbuscar"]');if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length);}});
 document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='z'&&!dlg.open&&!/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)){e.preventDefault();doUndo();}});
 
 function copyPrev(){const w=weeksOf(ui.mes)[ui.sem-1];const names={};S.personas.forEach(p=>{if(ui.area==='Todas'||p.a===ui.area)names[p.n]=1;});
@@ -1673,7 +1724,10 @@ function buildDoc(){const css=document.getElementById('css').textContent,app=doc
 function save(force){if(!CONF||!CONF.url){openConn();return;}const prev=S.guardado,was=dirty,btn=document.querySelector('[data-act="save"]');S.guardado=new Date().toISOString();dirty=false;
   if(btn)btn.disabled=true;
   api('POST',{base:prev,force:!!force,estado:S}).then(r=>{
-    if(r.ok){window.__vacio=false;try{localStorage.removeItem(DKEY);localStorage.setItem(CACHEK,JSON.stringify(S));}catch(e){}if(dlg.open)dlg.close();toast('Horario guardado en tu Google Drive.');render();return;}
+    if(r.ok){window.__vacio=false;try{localStorage.removeItem(DKEY);localStorage.setItem(CACHEK,JSON.stringify(S));}catch(e){}if(dlg.open)dlg.close();
+      const c=r.calendario;if(c&&!c.error){try{localStorage.setItem('reservas-cal','1');}catch(e){}}
+      const nc=c&&!c.error?(c.creados||0)+(c.actualizados||0)+(c.borrados||0):0;
+      toast(c&&c.error?'Guardado en tu Drive, pero no se pudo actualizar Google Calendar: '+c.error:'Horario guardado en tu Google Drive.'+(nc?` Google Calendar: ${nc} ${nc===1?'reserva actualizada':'reservas actualizadas'}.`:''));render();return;}
     S.guardado=prev;dirty=was;
     if(r.error==='conflicto'){F={};openD('conflict');}
     else if(r.error==='clave'){toast('La clave no es correcta. Revísala en Conexión.');}
