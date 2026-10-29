@@ -389,8 +389,8 @@ dialog::backdrop{background:rgba(18,19,18,.5);backdrop-filter:blur(2px)}
   .subbar .seg{max-width:100%;overflow-x:auto;flex-wrap:nowrap;-webkit-overflow-scrolling:touch}
   .subbar .seg button{white-space:nowrap}
   .prow,.mrow{grid-template-columns:104px minmax(0,1fr)}
-  .bnav{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;z-index:10;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
-  .bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;font-weight:600;color:var(--muted);padding:4px 0}
+  .bnav{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;left:0;right:0;bottom:0;z-index:10;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+  .bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;min-width:0;font-weight:600;color:var(--muted);padding:4px 0}
   .bnav button.on{color:var(--sel)}
   .bnav .ic{width:22px;height:22px}
   dialog{width:100%;max-width:100%;margin:auto 0 0;border-radius:20px 20px 0 0;max-height:92%}
@@ -495,6 +495,27 @@ dialog::backdrop{background:rgba(18,19,18,.5);backdrop-filter:blur(2px)}
 .lmppers input{accent-color:var(--sel);width:16px;height:16px}
 @media (max-width:760px){.lmphead .lmpwa{width:100%;justify-content:center}.dayhead .dnav{flex-wrap:wrap}
   .lmpte .lmprow{flex-wrap:wrap;justify-content:flex-end}.lmpte .lmprow input{flex:1 1 100%}}
+/* Reservas */
+.resav{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.resav select{border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:var(--surface);color:var(--ink);font:inherit}
+.resc{margin-bottom:10px}
+.resc .acts{margin-top:10px}
+.resc .acts a.btn{text-decoration:none}
+.resh{display:flex;gap:12px;align-items:center}
+.resho{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:var(--sel);min-width:64px}
+.resn b{display:block;font-size:16px}.resn small{color:var(--muted);font-size:12.5px}
+.resl{margin:6px 0 0;font-size:14px;line-height:1.4}
+.rcan{opacity:.6}.rcan .resn b{text-decoration:line-through}
+.pill.rs-pendiente{background:color-mix(in srgb,var(--under) 16%,transparent);color:var(--under)}
+.pill.rs-confirmada{background:color-mix(in srgb,var(--ok) 16%,transparent);color:var(--ok)}
+.pill.rs-llego{background:color-mix(in srgb,var(--sel) 14%,transparent);color:var(--sel)}
+.pill.rs-cancelada{background:var(--red-bg);color:var(--red-ink)}
+.resn .pill{margin:0;padding:1px 8px;font-size:11px}
+.resday .resrow{display:flex;gap:10px;align-items:baseline;padding:7px 0;border-top:1px solid var(--line);font-size:14px}
+.resday header+.resrow{border-top:0}
+.resday .resrow b{min-width:44px;color:var(--sel);font-variant-numeric:tabular-nums}
+.resday .resrow .pill{margin:0 0 0 auto}
+.bnav button span{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 </style></head><body><div id="root" class="wrap"></div><dialog id="ed" aria-label="Editar"></dialog><div id="toast" role="status" aria-live="polite"></div>
 <script id="estado" type="application/json">{"version":2,"meses":["2026-10"],"metas":{"f5":44.5,"f6":45,"pt":30,"antFull":200000,"antPart":150000},"personas":[],"turnos":[],"nov":[],"notas":{},"feriados":{"2026-01-01":{"n":"Año Nuevo","cerrado":false},"2026-04-03":{"n":"Viernes Santo","cerrado":false},"2026-04-04":{"n":"Sábado Santo","cerrado":false},"2026-05-01":{"n":"Día del Trabajo","cerrado":false},"2026-05-21":{"n":"Glorias Navales","cerrado":false},"2026-06-21":{"n":"Día de los Pueblos Indígenas","cerrado":false},"2026-06-29":{"n":"San Pedro y San Pablo","cerrado":false},"2026-07-16":{"n":"Virgen del Carmen","cerrado":false},"2026-08-15":{"n":"Asunción de la Virgen","cerrado":false},"2026-09-18":{"n":"Independencia Nacional","cerrado":false},"2026-09-19":{"n":"Glorias del Ejército","cerrado":false},"2026-10-12":{"n":"Encuentro de Dos Mundos","cerrado":false},"2026-10-31":{"n":"Iglesias Evangélicas y Protestantes","cerrado":false},"2026-11-01":{"n":"Todos los Santos","cerrado":false},"2026-12-08":{"n":"Inmaculada Concepción","cerrado":false},"2026-12-25":{"n":"Navidad","cerrado":false},"2027-01-01":{"n":"Año Nuevo","cerrado":false},"2027-03-26":{"n":"Viernes Santo","cerrado":false},"2027-03-27":{"n":"Sábado Santo","cerrado":false},"2027-05-01":{"n":"Día del Trabajo","cerrado":false},"2027-05-21":{"n":"Glorias Navales","cerrado":false},"2027-06-21":{"n":"Día de los Pueblos Indígenas","cerrado":false},"2027-06-28":{"n":"San Pedro y San Pablo","cerrado":false},"2027-07-16":{"n":"Virgen del Carmen","cerrado":false},"2027-08-15":{"n":"Asunción de la Virgen","cerrado":false},"2027-09-18":{"n":"Independencia Nacional","cerrado":false},"2027-09-19":{"n":"Glorias del Ejército","cerrado":false},"2027-10-11":{"n":"Encuentro de Dos Mundos","cerrado":false},"2027-10-31":{"n":"Iglesias Evangélicas y Protestantes","cerrado":false},"2027-11-01":{"n":"Todos los Santos","cerrado":false},"2027-12-08":{"n":"Inmaculada Concepción","cerrado":false},"2027-12-25":{"n":"Navidad","cerrado":false}},"extras":[],"anticipos":[],"consumos":[],"notasMes":{},"guardado":null}</script>
 <script id="app">
@@ -521,7 +542,7 @@ function normReps(){S.nov.forEach(n=>{n.reps=n.reps||{};Object.keys(n.reps).forE
 normReps();
 const FER_BASE={"2026-01-01": "Año Nuevo", "2026-04-03": "Viernes Santo", "2026-04-04": "Sábado Santo", "2026-05-01": "Día del Trabajo", "2026-05-21": "Glorias Navales", "2026-06-21": "Día de los Pueblos Indígenas", "2026-06-29": "San Pedro y San Pablo", "2026-07-16": "Virgen del Carmen", "2026-08-15": "Asunción de la Virgen", "2026-09-18": "Independencia Nacional", "2026-09-19": "Glorias del Ejército", "2026-10-12": "Encuentro de Dos Mundos", "2026-10-31": "Iglesias Evangélicas y Protestantes", "2026-11-01": "Todos los Santos", "2026-12-08": "Inmaculada Concepción", "2026-12-25": "Navidad", "2027-01-01": "Año Nuevo", "2027-03-26": "Viernes Santo", "2027-03-27": "Sábado Santo", "2027-05-01": "Día del Trabajo", "2027-05-21": "Glorias Navales", "2027-06-21": "Día de los Pueblos Indígenas", "2027-06-28": "San Pedro y San Pablo", "2027-07-16": "Virgen del Carmen", "2027-08-15": "Asunción de la Virgen", "2027-09-18": "Independencia Nacional", "2027-09-19": "Glorias del Ejército", "2027-10-11": "Encuentro de Dos Mundos", "2027-10-31": "Iglesias Evangélicas y Protestantes", "2027-11-01": "Todos los Santos", "2027-12-08": "Inmaculada Concepción", "2027-12-25": "Navidad"};
 if(!S.feriados){S.feriados={};Object.keys(FER_BASE).forEach(d=>{S.feriados[d]={n:FER_BASE[d],cerrado:false};});}
-S.extras=S.extras||[];S.anticipos=S.anticipos||[];S.consumos=S.consumos||[];S.cerrados=S.cerrados||{};S.limpieza=S.limpieza||null;
+S.extras=S.extras||[];S.anticipos=S.anticipos||[];S.consumos=S.consumos||[];S.cerrados=S.cerrados||{};S.limpieza=S.limpieza||null;S.reservas=S.reservas||[];
 if(!S.notasMes){S.notasMes={};if(S.notas&&Object.keys(S.notas).length)S.notasMes[S.meses[0]]=S.notas;}
 if(S.metas.antFull==null)S.metas.antFull=200000;if(S.metas.antPart==null)S.metas.antPart=150000;
 const AUT='Autorizado por supervisor';
@@ -868,13 +889,13 @@ function respDif(st){const L=[],n=(x,a,b)=>x+' '+(x===1?a:b);
   const cmp=(k,lbl,key)=>{const K=key||(x=>x.id),B={},A={};(st[k]||[]).forEach(x=>{B[K(x)]=JSON.stringify(x);});(S[k]||[]).forEach(x=>{A[K(x)]=1;});
     let q=0,c=0,g=0;(S[k]||[]).forEach(x=>{const b=B[K(x)];if(b==null)q++;else if(b!==JSON.stringify(x))c++;});(st[k]||[]).forEach(x=>{if(!A[K(x)])g++;});
     const P=[q&&n(q,'se quita','se quitan'),c&&n(c,'cambia','cambian'),g&&n(g,'se agrega','se agregan')].filter(Boolean);if(P.length)L.push(lbl+': '+P.join(', ')+'.');};
-  cmp('turnos','Turnos');cmp('nov','Ausencias');cmp('extras','Horas extra');cmp('anticipos','Anticipos');cmp('consumos','Consumos');cmp('personas','Trabajadores',p=>p.n);
+  cmp('turnos','Turnos');cmp('nov','Ausencias');cmp('extras','Horas extra');cmp('anticipos','Anticipos');cmp('consumos','Consumos');cmp('reservas','Reservas');cmp('personas','Trabajadores',p=>p.n);
   const mq=S.meses.filter(m=>!st.meses.includes(m));if(mq.length)L.push('Meses que desaparecen: '+mq.map(ymName).join(', ')+'.');
   const cz=Object.keys(S.cerrados).filter(m=>!(st.cerrados||{})[m]);if(cz.length)L.push('Meses que vuelven a quedar abiertos: '+cz.map(ymName).join(', ')+'.');
   if(JSON.stringify(S.limpieza||null)!==JSON.stringify(st.limpieza||null))L.push(st.limpieza?'Listas de limpieza: cambian.':'Listas de limpieza: se quitan.');
   return L;}
 function applyBackup(st){
-  pushUndo();S.personas=st.personas;S.turnos=st.turnos;S.meses=st.meses.sort();S.metas=Object.assign({},S.metas,st.metas||{});S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.limpieza=st.limpieza||null;S.notasMes=st.notasMes||(st.notas?{[st.meses[0]]:st.notas}:{});
+  pushUndo();S.personas=st.personas;S.turnos=st.turnos;S.meses=st.meses.sort();S.metas=Object.assign({},S.metas,st.metas||{});S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.limpieza=st.limpieza||null;S.reservas=st.reservas||[];S.notasMes=st.notasMes||(st.notas?{[st.meses[0]]:st.notas}:{});
   S.personas.forEach(p=>{if(!('desde' in p))p.desde=null;if(!('hasta' in p))p.hasta=null;if(!('vac' in p))p.vac=null;});S.turnos.forEach((t,i)=>{if(!t.id)t.id='t'+i;});normReps();
   if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];changed();dlg.close();toast('Respaldo cargado. Revisa y presiona Guardar para dejarlo.',true);}
 const hs=x=>x.slice(3)==='00'?x.slice(0,2):x;
@@ -934,11 +955,12 @@ const IC={hoy:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93
  save:'<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/>',
  limp:'<path d="M12 3l1.6 4.4L18 9l-4.4 1.6L12 15l-1.6-4.4L6 9l4.4-1.6z"/><path d="M19 14l.8 2.2 2.2.8-2.2.8L19 20l-.8-2.2-2.2-.8 2.2-.8z"/>',
  wa:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',up:'<path d="m18 15-6-6-6 6"/>',down:'<path d="m6 9 6 6 6-6"/>',x:'<path d="M18 6 6 18M6 6l12 12"/>',
+ res:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 9h18"/><circle cx="12" cy="15" r="3.2"/><path d="M12 13.6V15l.9.9"/>',plus:'<path d="M12 5v14M5 12h14"/>',
  tema:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor"/>',
  menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',cl:'<path d="m15 18-6-6 6-6"/>',cr:'<path d="m9 18 6-6-6-6"/>'};
 const ico=k=>`<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg>`;
-const NAV=[['hoy','Hoy','hoy'],['semana','Horario','cal'],['cierre','Cierre','clip'],['pagos','Pagos','wallet'],['persona','Personal','users'],['limpieza','Limpieza','limp']];
-const TITLES={hoy:'Hoy',semana:'Horario',resumen:'Horario',mes:'Horario',cierre:'Cierre del mes',pagos:'Anticipos y consumo',persona:'Personal',limpieza:'Limpieza'};
+const NAV=[['hoy','Hoy','hoy'],['semana','Horario','cal'],['cierre','Cierre','clip'],['pagos','Pagos','wallet'],['persona','Personal','users'],['limpieza','Limpieza','limp'],['reservas','Reservas','res']];
+const TITLES={hoy:'Hoy',semana:'Horario',resumen:'Horario',mes:'Horario',cierre:'Cierre del mes',pagos:'Anticipos y consumo',persona:'Personal',limpieza:'Limpieza',reservas:'Reservas'};
 const navOn=v=>ui.vista===v||(v==='semana'&&(ui.vista==='resumen'||ui.vista==='mes'));
 const MQ=window.matchMedia('(max-width: 760px)');const narrow=()=>MQ.matches;
 if(MQ.addEventListener)MQ.addEventListener('change',()=>render());
@@ -951,17 +973,17 @@ function render(){index();
   const side=`<aside class="side"><div class="brand"><span class="logo">T</span><div><b>TimeOut</b><small>Horario del personal</small></div></div>
     <nav class="snav" aria-label="Secciones">${NAV.map(([v,l,k])=>`<button data-act="vista" data-v="${v}" title="${l}" class="${navOn(v)?'on':''}"${navOn(v)?' aria-current="page"':''}>${ico(k)}<span>${l}</span></button>`).join('')}</nav>
     <div class="sfoot"><button data-act="crear" title="Crear meses">${ico('calplus')}<span>Crear meses</span></button>${caps.downloads?`<button data-act="export" title="Exportar a Excel">${ico('dl')}<span>Exportar a Excel</span></button>`:''}<button data-act="resp" title="Respaldo">${ico('arch')}<span>Respaldo</span></button><button data-act="tema" title="Tema">${ico('tema')}<span>Tema: ${TEMAS[temaAct()]}</span></button><button data-act="conn" title="Conexión">${ico('users')}<span>Conexión</span></button></div></aside>`;
-  const mesnav=ui.vista==='hoy'||ui.vista==='limpieza'?'':`<div class="mesnav"><button class="icon" data-act="mesmov" data-v="-1" aria-label="Mes anterior"${i<=0?' disabled':''}>${ico('cl')}</button><select data-act="mes" aria-label="Mes">${S.meses.map(m=>`<option value="${m}"${m===ui.mes?' selected':''}>${ymName(m)}${mesCerr(m)?' · cerrado':''}</option>`).join('')}</select><button class="icon" data-act="mesmov" data-v="1" aria-label="Mes siguiente"${i>=S.meses.length-1?' disabled':''}>${ico('cr')}</button></div>`;
+  const mesnav=ui.vista==='hoy'||ui.vista==='limpieza'||ui.vista==='reservas'?'':`<div class="mesnav"><button class="icon" data-act="mesmov" data-v="-1" aria-label="Mes anterior"${i<=0?' disabled':''}>${ico('cl')}</button><select data-act="mes" aria-label="Mes">${S.meses.map(m=>`<option value="${m}"${m===ui.mes?' selected':''}>${ymName(m)}${mesCerr(m)?' · cerrado':''}</option>`).join('')}</select><button class="icon" data-act="mesmov" data-v="1" aria-label="Mes siguiente"${i>=S.meses.length-1?' disabled':''}>${ico('cr')}</button></div>`;
   const top=`<header class="topbar"><div class="tl"><button class="icon sidet" data-act="sidet" aria-label="${isMini()?'Mostrar menú':'Ocultar menú'}" title="${isMini()?'Mostrar menú':'Ocultar menú'}">${ico('menu')}</button><h1>${TITLES[ui.vista]}</h1>${mesnav}</div><div class="tr">${est}<button class="icon" data-act="undo" aria-label="Deshacer" title="Deshacer"${undo.length?'':' disabled'}>${ico('undo')}</button><button class="icon mas" data-act="mas" aria-label="Más opciones">${ico('more')}</button><button class="btn pri" data-act="save" aria-label="Guardar"${loading?' disabled':''}>${ico('save')}<span>Guardar</span></button></div></header>`;
-  const banner=(window.__scriptViejo?'<div class="banner"><span>Tu script de Google es de una versión anterior y la clave todavía viaja en la dirección web. Pega el Codigo.gs nuevo en script.google.com y publica una versión nueva (Implementar &gt; Gestionar implementaciones &gt; editar &gt; Nueva versión).</span></div>':'')+(window.__vacio?'<div class="banner"><span>Tu Google Drive todavía no tiene datos. Carga tu respaldo y presiona Guardar.</span><button class="btn" data-act="resp">Cargar respaldo</button></div>':'')+(window.__draftMsg?'<div class="banner"><span>Recuperamos cambios que no alcanzaste a guardar.</span><button class="btn" data-act="descartar">Descartar cambios</button></div>':'')
-    +(ui.vista!=='hoy'&&ui.vista!=='cierre'&&ui.vista!=='limpieza'&&mesCerr(ui.mes)?`<div class="banner"><span>${esc(cerrMsg(ui.mes))}</span><button class="btn" data-act="vista" data-v="cierre">Ver cierre</button></div>`:'');
+  const banner=resBanner()+(window.__scriptViejo?'<div class="banner"><span>Tu script de Google es de una versión anterior y la clave todavía viaja en la dirección web. Pega el Codigo.gs nuevo en script.google.com y publica una versión nueva (Implementar &gt; Gestionar implementaciones &gt; editar &gt; Nueva versión).</span></div>':'')+(window.__vacio?'<div class="banner"><span>Tu Google Drive todavía no tiene datos. Carga tu respaldo y presiona Guardar.</span><button class="btn" data-act="resp">Cargar respaldo</button></div>':'')+(window.__draftMsg?'<div class="banner"><span>Recuperamos cambios que no alcanzaste a guardar.</span><button class="btn" data-act="descartar">Descartar cambios</button></div>':'')
+    +(ui.vista!=='hoy'&&ui.vista!=='cierre'&&ui.vista!=='limpieza'&&ui.vista!=='reservas'&&mesCerr(ui.mes)?`<div class="banner"><span>${esc(cerrMsg(ui.mes))}</span><button class="btn" data-act="vista" data-v="cierre">Ver cierre</button></div>`:'');
   let sub='';
   if(ui.vista==='semana'||ui.vista==='resumen'||ui.vista==='mes'){
     sub=`<div class="subbar"><div class="seg" aria-label="Vista">${[['semana',narrow()?'Día':'Semana'],['mes','Mes'],['resumen','Resumen semanal']].map(v=>`<button data-act="vista" data-v="${v[0]}" aria-pressed="${ui.vista===v[0]}">${v[1]}</button>`).join('')}</div>`;
     if(ui.vista==='semana'||ui.vista==='mes'){sub+=`<div class="seg" aria-label="Área">${AREAS.concat(['Todas']).map(a=>`<button data-act="area" data-v="${a}" aria-pressed="${ui.area===a}">${a}</button>`).join('')}</div>`;
       if(ui.vista==='semana')sub+=`<div class="seg weeks" aria-label="Semana">${weeksOf(ui.mes).map(w=>`<button data-act="sem" data-v="${w.n}" aria-pressed="${ui.sem===w.n}">Sem ${w.n}<small>${w.lbl}</small></button>`).join('')}</div>`;}
     sub+='</div>';}
-  const body=ui.vista==='hoy'?vHoy():ui.vista==='semana'?vSemana():ui.vista==='mes'?vMes():ui.vista==='resumen'?vResumen():ui.vista==='cierre'?vCierre():ui.vista==='pagos'?vPagos():ui.vista==='limpieza'?vLimpieza():vPersona();
+  const body=ui.vista==='hoy'?vHoy():ui.vista==='semana'?vSemana():ui.vista==='mes'?vMes():ui.vista==='resumen'?vResumen():ui.vista==='cierre'?vCierre():ui.vista==='pagos'?vPagos():ui.vista==='limpieza'?vLimpieza():ui.vista==='reservas'?vReservas():vPersona();
   $('#root').innerHTML=`<div class="app${isMini()?' mini':''}">${side}<div class="mainw">${top}<main class="content">${banner}${sub}${body}</main></div></div><nav class="bnav" aria-label="Secciones">${NAV.map(([v,l,k])=>`<button data-act="vista" data-v="${v}" class="${navOn(v)?'on':''}"${navOn(v)?' aria-current="page"':''}>${ico(k)}<span>${l}</span></button>`).join('')}</nav>`;}
 
 /* ---------- limpieza: listas por área; los responsables salen del horario de cada día ---------- */
@@ -1087,6 +1109,65 @@ function lmpCampo(t){const A=lmpArea(ui.lmpArea||'Cocina');if(!A)return;const k=
   else if(k==='spers'){const s=A.sectores[si],n=t.dataset.p;s.personas=t.checked?s.personas.filter(x=>x!==n).concat([n]):s.personas.filter(x=>x!==n);}
   changed();}
 
+/* ---------- reservas: se anotan a mano (llegan por WhatsApp) y la app avisa antes mientras está abierta ---------- */
+const RESE={pendiente:'Pendiente',confirmada:'Confirmada',llego:'Llegó',cancelada:'Cancelada'};
+const RESAK='reservas-avisos',RESDK='reservas-avisadas';
+const RESAV=[['60,15','1 hora y 15 min antes'],['60','1 hora antes'],['30','30 min antes'],['15','15 min antes'],['','No avisar']];
+const resAvisos=()=>{try{const v=JSON.parse(localStorage.getItem(RESAK)||'null');return Array.isArray(v)?v:[60,15];}catch(e){return [60,15];}};
+const resT=r=>new Date(r.fecha+'T'+r.hora+':00').getTime();
+const resActiva=r=>r.fecha&&r.hora&&r.estado!=='cancelada'&&r.estado!=='llego';
+const resFalta=min=>min>=60?(min%60?Math.floor(min/60)+' h '+(min%60)+' min':(min/60)+' h'):min+' min';
+/* reservas que vienen dentro del aviso más largo (para el aviso arriba en la app) */
+function resProx(){const now=Date.now(),mx=Math.max(0,...resAvisos())*60000;
+  return (S.reservas||[]).filter(r=>resActiva(r)&&resT(r)>now&&resT(r)-now<=mx).sort((a,b)=>resT(a)-resT(b));}
+function resBanner(){return ui.vista==='reservas'?'':resProx().map(r=>`<div class="banner"><span><b>Reserva a las ${r.hora}</b>: ${esc(r.nombre)}${r.personas?`, ${r.personas} personas`:''} (en ${resFalta(Math.max(1,Math.round((resT(r)-Date.now())/60000)))})</span><button class="btn" data-act="vista" data-v="reservas">Ver</button></div>`).join('');}
+function resOlvidar(id){try{const M=JSON.parse(localStorage.getItem(RESDK)||'{}');Object.keys(M).forEach(k=>{if(k.split('|')[0]===id)delete M[k];});localStorage.setItem(RESDK,JSON.stringify(M));}catch(e){}}
+/* revisa cada 30 s: si una reserva entra en su aviso, notifica una vez (si hay varios avisos vencidos a la vez, uno solo) */
+function resRevisar(){const L=resAvisos();if(!L.length||!(S.reservas||[]).length)return;const now=Date.now();let M;try{M=JSON.parse(localStorage.getItem(RESDK)||'{}');}catch(e){M={};}
+  let hubo=false;
+  S.reservas.forEach(r=>{if(!resActiva(r))return;const t=resT(r);if(now>=t)return;const due=L.filter(m=>now>=t-m*60000&&!M[r.id+'|'+m]);if(!due.length)return;
+    due.forEach(m=>{M[r.id+'|'+m]=1;});hubo=true;resNotificar(r,Math.max(1,Math.round((t-now)/60000)));});
+  const vivas={};(S.reservas||[]).forEach(r=>{if(r.fecha&&r.hora&&resT(r)>now-86400000)vivas[r.id]=1;});Object.keys(M).forEach(k=>{if(!vivas[k.split('|')[0]])delete M[k];});
+  try{localStorage.setItem(RESDK,JSON.stringify(M));}catch(e){}
+  const ae=document.activeElement;if(hubo&&!(ae&&$('#root').contains(ae)&&/INPUT|TEXTAREA|SELECT/.test(ae.tagName)))render();}
+function resNotificar(r,min){const tit=`Reserva a las ${r.hora}: ${r.nombre}`,txt=[r.personas?r.personas+' personas':'','en '+resFalta(min),r.motivo||''].filter(Boolean).join(' · ');
+  toast(tit+' ('+txt+')');
+  if(!('Notification' in window)||Notification.permission!=='granted')return;const o={body:txt,tag:'res-'+r.id,icon:'icon-192.png',badge:'icon-192.png'};
+  const simple=()=>{try{new Notification(tit,o);}catch(e){}};
+  if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration)navigator.serviceWorker.getRegistration().then(g=>g?g.showNotification(tit,o):simple()).catch(simple);else simple();}
+setInterval(resRevisar,30000);setTimeout(resRevisar,2500);
+/* enlaces: Google Calendar con la reserva lista para guardar, y WhatsApp al cliente con la confirmación */
+function resCal(r){const fin=new Date(resT(r)+2*3600000),f2=fin.getFullYear()+pad(fin.getMonth()+1)+pad(fin.getDate())+'T'+pad(fin.getHours())+pad(fin.getMinutes())+'00';
+  const det=[r.personas?r.personas+' personas':'',r.motivo?'Motivo: '+r.motivo:'',r.pedido?'Qué van a comer: '+r.pedido:'',r.tel?'Teléfono: '+r.tel:'',r.notas||''].filter(Boolean).join('\n');
+  return 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='+encodeURIComponent('Reserva: '+r.nombre+(r.personas?' ('+r.personas+' pers.)':''))+'&dates='+r.fecha.replace(/-/g,'')+'T'+r.hora.replace(':','')+'00/'+f2+'&ctz=America/Santiago&details='+encodeURIComponent(det);}
+function resTel(t){let d=String(t||'').replace(/\D/g,'');if(d.length===9&&d[0]==='9')d='56'+d;else if(d.length===8)d='569'+d;return d;}
+function resWa(r){return 'https://wa.me/'+resTel(r.tel)+'?text='+encodeURIComponent(`Hola ${r.nombre}, te confirmamos tu reserva para el ${flong(r.fecha)} a las ${r.hora}`+(r.personas?` para ${r.personas} personas`:'')+'. ¡Te esperamos!');}
+const resDia=d=>d===TODAY?'Hoy · '+flong(d):d===addD(TODAY,1)?'Mañana · '+flong(d):cap(flong(d));
+function resCard(r){const ok=resActiva(r),txt=s=>esc(s).replace(/\n/g,'<br>');
+  return `<div class="card resc${r.estado==='cancelada'?' rcan':''}"><div class="resh"><span class="resho">${r.hora}</span><div class="resn"><b>${esc(r.nombre)}</b><small>${r.personas?r.personas+' personas · ':''}<span class="pill rs-${r.estado}">${RESE[r.estado]||r.estado}</span></small></div></div>`+
+    (r.motivo?`<p class="resl"><span class="muted">Motivo:</span> ${txt(r.motivo)}</p>`:'')+(r.pedido?`<p class="resl"><span class="muted">Qué van a comer:</span> ${txt(r.pedido)}</p>`:'')+
+    (r.tel?`<p class="resl"><span class="muted">Teléfono:</span> ${esc(r.tel)}</p>`:'')+(r.notas?`<p class="resl"><span class="muted">Notas:</span> ${txt(r.notas)}</p>`:'')+
+    `<div class="acts"><button class="btn" data-act="resedit" data-id="${r.id}">Editar</button>`+
+    (ok&&r.estado==='pendiente'?`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="confirmada">Confirmada</button>`:'')+
+    (ok?`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="llego">Llegó</button><button class="btn" data-act="resestado" data-id="${r.id}" data-v="cancelada">Cancelar</button>`:`<button class="btn" data-act="resestado" data-id="${r.id}" data-v="pendiente">Reactivar</button>`)+
+    (r.tel?`<a class="btn" href="${esc(resWa(r))}" target="_blank" rel="noopener">${ico('wa')}<span>WhatsApp</span></a>`:'')+
+    (ok?`<a class="btn" href="${esc(resCal(r))}" target="_blank" rel="noopener">${ico('cal')}<span>Google Calendar</span></a>`:'')+'</div></div>';}
+function vReservas(){const L=S.reservas||[],ver=ui.resVer||'prox',av=resAvisos().join(','),N='Notification' in window?Notification.permission:'no';
+  const prox=L.filter(r=>r.fecha>=TODAY);
+  let h=`<div class="dayhead"><div><h2>${prox.filter(resActiva).length} ${prox.filter(resActiva).length===1?'reserva próxima':'reservas próximas'}</h2></div><button class="btn pri" data-act="resnew">${ico('plus')}<span>Nueva reserva</span></button></div>`;
+  h+=`<div class="subbar"><div class="seg" aria-label="Ver">${[['prox','Próximas'],['pasadas','Pasadas']].map(([v,l])=>`<button data-act="resver" data-v="${v}" aria-pressed="${ver===v}">${l}</button>`).join('')}</div>`+
+    `<label class="resav">Avisar <select data-act="resaviso" aria-label="Cuándo avisar">${RESAV.map(([v,l])=>`<option value="${v}"${v===av?' selected':''}>${l}</option>`).join('')}</select></label>`+
+    (N==='default'?`<button class="btn" data-act="resnotif">Activar notificaciones</button>`:N==='denied'?'<span class="muted">Notificaciones bloqueadas en este navegador</span>':N==='granted'?'<span class="muted">Notificaciones activadas en este equipo</span>':'')+'</div>';
+  h+='<p class="nota">La app avisa mientras está abierta. Para que el celular te avise aunque esté cerrada, usa <b>Google Calendar</b> en cada reserva; en Google Calendar deja como notificación predeterminada 1 hora y 15 minutos antes.</p>';
+  const lista=(ver==='prox'?prox:L.filter(r=>r.fecha<TODAY)).slice().sort((a,b)=>{const x=a.fecha+a.hora,y=b.fecha+b.hora;return ver==='prox'?(x<y?-1:x>y?1:0):(x>y?-1:x<y?1:0);});
+  if(!lista.length)return h+`<div class="card"><p style="margin:0">${ver==='prox'?'No hay reservas próximas. Cuando te llegue una por WhatsApp, anótala con <b>Nueva reserva</b>.':'No hay reservas pasadas.'}</p></div>`;
+  let dia='';lista.forEach(r=>{if(r.fecha!==dia){dia=r.fecha;const n=lista.filter(x=>x.fecha===dia&&x.estado!=='cancelada').reduce((a,x)=>a+(x.personas||0),0);h+=`<h3 class="lmpmom">${resDia(dia)}${n?` · ${n} personas`:''}</h3>`;}h+=resCard(r);});
+  return h;}
+/* tarjeta en Hoy con las reservas del día */
+function resHoy(d){const L=(S.reservas||[]).filter(r=>r.fecha===d&&r.estado!=='cancelada').sort((a,b)=>a.hora<b.hora?-1:1);if(!L.length)return '';
+  return `<section class="card acard resday"><header><h3>Reservas</h3><button class="btn sm" data-act="vista" data-v="reservas">Ver todas</button></header>${L.map(r=>`<div class="resrow"><b>${r.hora}</b><span>${esc(r.nombre)}${r.personas?` · ${r.personas} pers.`:''}${r.motivo?` · ${esc(r.motivo)}`:''}</span>${r.estado==='llego'?'<span class="pill rs-llego">Llegó</span>':''}</div>`).join('')}</section>`;}
+function openRes(id){const r=id&&(S.reservas||[]).find(x=>x.id===id);F=r?Object.assign({err:''},r,{personas:r.personas==null?'':r.personas}):{fecha:ui.resFecha||TODAY,hora:'20:00',nombre:'',personas:'',tel:'',motivo:'',pedido:'',notas:'',estado:'pendiente',err:''};openD('reserva');}
+
 const dObj=iso=>({iso,day:+iso.slice(8),dow:dow(iso),inMonth:true});
 function vHoy(){const d=ui.dia||TODAY,ym=ymOf(d);
   const nav=`<div class="dnav"><button class="icon" data-act="dia" data-v="-1" aria-label="Día anterior">${ico('cl')}</button><button class="btn" data-act="dia" data-v="0">Hoy</button><button class="icon" data-act="dia" data-v="1" aria-label="Día siguiente">${ico('cr')}</button></div>`;
@@ -1103,6 +1184,7 @@ function vHoy(){const d=ui.dia||TODAY,ym=ymOf(d);
     (A[p.a]=A[p.a]||[]).push({p,st});});
   let h=`<div class="dayhead"><div><h2>${cap(flong(d))}</h2>${d===TODAY?'<span class="pill blue">Hoy</span>':''}${fe?`<span class="pill ${cz?'':'red'}">${esc(fe.n)}${cz?', no se trabaja':''}</span>`:''}</div>${nav}</div>`;
   h+=`<div class="kpis">${[['Trabajando',nTrab],['Horas del día',fh(hTot)],['Ausencias',nAus],['Horas extra',fh(hExt)]].map(([k,v])=>`<div class="card kpi"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;
+  h+=resHoy(d);
   h+='<div class="agrid">';
   AREAS.forEach(a=>{const L=A[a].sort((x,y)=>x.st-y.st),g=dayGaps(a,d);
     h+=`<section class="card acard"><header><h3>${a}</h3><span class="muted">${L.length} ${L.length===1?'persona':'personas'}</span></header>`;
@@ -1130,9 +1212,9 @@ function vSemanaMovil(w,areas){
   return h;}
 
 /* ---------- estado y deshacer ---------- */
-const snapshot=()=>JSON.stringify({p:S.personas,t:S.turnos,m:S.metas,n:S.nov,ms:S.meses,f:S.feriados,x:S.extras,a:S.anticipos,c:S.consumos,nm:S.notasMes,z:S.cerrados,l:S.limpieza});
+const snapshot=()=>JSON.stringify({p:S.personas,t:S.turnos,m:S.metas,n:S.nov,ms:S.meses,f:S.feriados,x:S.extras,a:S.anticipos,c:S.consumos,nm:S.notasMes,z:S.cerrados,l:S.limpieza,r:S.reservas});
 function pushUndo(){undo.push(snapshot());if(undo.length>30)undo.shift();}
-function restore(o){S.personas=o.p;S.turnos=o.t;S.metas=o.m;S.nov=o.n||[];normReps();S.feriados=o.f||S.feriados;S.extras=o.x||[];S.anticipos=o.a||[];S.consumos=o.c||[];S.notasMes=o.nm||S.notasMes;S.meses=o.ms||S.meses;S.cerrados=o.z||{};if('l' in o)S.limpieza=o.l;if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];}
+function restore(o){S.personas=o.p;S.turnos=o.t;S.metas=o.m;S.nov=o.n||[];normReps();S.feriados=o.f||S.feriados;S.extras=o.x||[];S.anticipos=o.a||[];S.consumos=o.c||[];S.notasMes=o.nm||S.notasMes;S.meses=o.ms||S.meses;S.cerrados=o.z||{};if('l' in o)S.limpieza=o.l;if('r' in o)S.reservas=o.r||[];if(!S.meses.includes(ui.mes))ui.mes=S.meses[S.meses.length-1];}
 function changed(sinRender){dirty=true;try{localStorage.setItem(DKEY,JSON.stringify({base:S.guardado,data:JSON.parse(snapshot())}));}catch(e){}
   /* sinRender: al escribir en un campo no se redibuja, para no perder el foco ni el clic siguiente */
   if(!sinRender){render();return;}const e=document.querySelector('.topbar .estado');if(e){e.className='estado dirty';e.textContent='Cambios sin guardar';}const u=document.querySelector('.topbar [data-act="undo"]');if(u)u.disabled=false;}
@@ -1334,6 +1416,16 @@ function draw(){let h='<div class="ed">';const m=ed.mode;
   else if(m==='reabrir'){const mes=MESES[+ui.mes.slice(5,7)-1];
     h+=`<h2>Reabrir ${mes}</h2><p class="f">Se descarta el cierre guardado y ${mes} vuelve a calcularse con los datos actuales; si cambiaste metas, contratos o datos de alguien desde que lo cerraste, las cifras pueden cambiar.</p><p class="f">El mes se podrá editar de nuevo. Cuando termines, ciérralo otra vez.</p>`;
     h+=`<footer><button class="btn" data-ed="close">Cancelar</button><button class="btn pri" data-ed="reabrirok">Reabrir ${mes}</button></footer>`;}
+  else if(m==='reserva'){const nuevo=!F.id;h+=`<h2>${nuevo?'Nueva reserva':'Editar reserva'}</h2><p class="f">Anota los datos que te llegaron por WhatsApp. Se guarda en tu Drive al presionar Guardar.</p>`;
+    h+=`<div class="two">${fld('Fecha',inp('fecha','date',F.fecha))}${fld('Hora',inp('hora','time',F.hora))}</div>`;
+    h+=`<div class="two">${fld('Nombre de la reserva',inp('nombre','text',F.nombre,' autocomplete="off" placeholder="Ej.: Familia Pérez"'))}${fld('Personas',inp('personas','number',F.personas,' min="1" step="1" inputmode="numeric"'))}</div>`;
+    h+=fld('Teléfono (WhatsApp)',inp('tel','tel',F.tel,' placeholder="+56 9 1234 5678" autocomplete="off"'),'Para responderle por WhatsApp desde la reserva.');
+    h+=fld('Motivo',inp('motivo','text',F.motivo,' list="resmotivos" autocomplete="off" placeholder="Cumpleaños, aniversario, reunión…"'))+'<datalist id="resmotivos">'+['Cumpleaños','Aniversario','Cena de empresa','Reunión','Despedida','Celebración'].map(x=>`<option value="${x}">`).join('')+'</datalist>';
+    h+=fld('Qué van a comer',`<textarea data-k="pedido" rows="3" placeholder="Si te dijeron el pedido, anótalo aquí">${esc(F.pedido||'')}</textarea>`);
+    h+=fld('Notas',`<textarea data-k="notas" rows="2" placeholder="Mesa, decoración, alergias…">${esc(F.notas||'')}</textarea>`);
+    if(!nuevo)h+=fld('Estado',sel('estado',Object.entries(RESE),F.estado));
+    if(F.err)h+=`<p class="err">${esc(F.err)}</p>`;
+    h+=`<footer>${nuevo?'':'<button class="btn" data-ed="resdel">Borrar</button>'}<button class="btn" data-ed="close">Cancelar</button><button class="btn pri" data-ed="ressave">Guardar reserva</button></footer>`;}
   const ro=edSoloLect();if(ro)h=h.replace('<div class="ed">',`<div class="ed"><div class="banner">${esc(ro)}</div>`);
   dlg.innerHTML=h+'</div>';
   if(ro)dlg.querySelectorAll('input,select,textarea,button').forEach(el=>{if(el.dataset.ed!=='close'&&el.dataset.ed!=='novedit')el.disabled=true;});}
@@ -1388,6 +1480,11 @@ dlg.addEventListener('click',e=>{if(e.target===dlg){dlg.close();return;}
   if(a==='cerrarok'){const ym=ui.mes;pushUndo();S.cerrados[ym]={fecha:new Date().toISOString(),base:S.metas.base==='mes'?'mes':'30',filas:cierreFilas(ym)};
     changed();dlg.close();toast(ymName(ym)+' cerrado. Presiona Guardar para dejarlo en tu Drive.',true);return;}
   if(a==='reabrirok'){const ym=ui.mes;pushUndo();delete S.cerrados[ym];changed();dlg.close();toast(ymName(ym)+' reabierto: ya se puede editar.',true);return;}
+  if(a==='ressave'){const nm=String(F.nombre||'').trim();if(!F.fecha||!F.hora||!nm){F.err='Indica la fecha, la hora y el nombre de la reserva.';draw();return;}
+    const per=parseInt(F.personas,10),o={id:F.id||nid('r'),fecha:F.fecha,hora:F.hora,nombre:nm,personas:per>0?per:null,tel:String(F.tel||'').trim(),motivo:String(F.motivo||'').trim(),pedido:String(F.pedido||'').trim(),notas:String(F.notas||'').trim(),estado:F.estado||'pendiente',creada:F.creada||new Date().toISOString()};
+    pushUndo();const i=S.reservas.findIndex(x=>x.id===o.id);if(i>=0){const pr=S.reservas[i];if(pr.fecha!==o.fecha||pr.hora!==o.hora)resOlvidar(o.id);S.reservas[i]=o;}else S.reservas.push(o);
+    changed();dlg.close();toast('Reserva de '+nm+' guardada. Presiona Guardar para dejarla en tu Drive.',true);return;}
+  if(a==='resdel'){pushUndo();S.reservas=S.reservas.filter(x=>x.id!==F.id);changed();dlg.close();toast('Reserva borrada.',true);return;}
   if(a!=='novedit'){const ym=edBloq();if(ym){if(edSoloLect())toast(cerrMsg(ym));else{F.err=cerrMsg(ym);draw();}return;}}
   if(ed.mode==='turno'){const p=person(ed.p);
     if(a==='swap'){F={p:ed.p,d:ed.d,o:'',err:''};openD('swap');return;}
@@ -1527,6 +1624,11 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(
   else if(a==='dsel'){ui.dsel=b.dataset.v;render();}
   else if(a==='dia'){const v=+b.dataset.v;ui.dia=v===0?TODAY:addD(ui.dia||TODAY,v);render();}
   else if(a==='pdetalle')exportX('persona',b.dataset.p);
+  else if(a==='resnew')openRes(null);
+  else if(a==='resedit')openRes(b.dataset.id);
+  else if(a==='resver'){ui.resVer=b.dataset.v;render();}
+  else if(a==='resestado'){const r=S.reservas.find(x=>x.id===b.dataset.id);if(r){pushUndo();r.estado=b.dataset.v;if(b.dataset.v==='pendiente')resOlvidar(r.id);changed();toast('Reserva de '+r.nombre+': '+RESE[r.estado].toLowerCase()+'.',true);}}
+  else if(a==='resnotif'){if('Notification' in window)Notification.requestPermission().then(()=>render());}
   else if(a==='lmparea'){ui.lmpArea=b.dataset.v;render();}
   else if(a==='lmpdia'){const v=+b.dataset.v;ui.lmpDia=v===0?TODAY:addD(ui.lmpDia||TODAY,v);render();}
   else if(a==='lmpedit'){ui.lmpEdit=!ui.lmpEdit;render();window.scrollTo(0,0);}
@@ -1551,6 +1653,7 @@ document.addEventListener('change',e=>{const t=e.target;if(dlg.contains(t))retur
   if(t.dataset.lmp){lmpCampo(t);return;}
   if(t.dataset.act==='lmpfecha'){if(t.value){ui.lmpDia=t.value;render();}return;}
   if(t.dataset.act==='lmpelige'){lmpElegir(t.dataset.d,t.dataset.a,t.value);render();return;}
+  if(t.dataset.act==='resaviso'){try{localStorage.setItem(RESAK,JSON.stringify(t.value?t.value.split(',').map(Number):[]));}catch(x){}render();return;}
   if(t.dataset.act==='psel'){ui.persona=t.value;render();}
   else if(t.dataset.act==='mes'){ui.mes=t.value;ui.sem=semHoy();render();}
   else if(t.dataset.meta2){pushUndo();S.metas[t.dataset.meta2]=t.value;changed();}
@@ -1866,7 +1969,7 @@ function api(method,body){const post=b=>fetch(CONF.url,{method:'POST',body:JSON.
     window.__scriptViejo=true;const sep=CONF.url.includes('?')?'&':'?';
     return fetch(CONF.url+sep+'key='+encodeURIComponent(CONF.key)+'&t='+Date.now()).then(x=>x.json());});}
 function applyState(st){S.personas=st.personas||[];S.turnos=st.turnos||[];S.meses=(st.meses&&st.meses.length?st.meses:S.meses).slice().sort();S.metas=Object.assign({},S.metas,st.metas||{});
-  S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.limpieza=st.limpieza||null;
+  S.nov=st.nov||[];S.feriados=st.feriados||S.feriados;S.extras=st.extras||[];S.anticipos=st.anticipos||[];S.consumos=st.consumos||[];S.cerrados=st.cerrados||{};S.limpieza=st.limpieza||null;S.reservas=st.reservas||[];
   S.notasMes=st.notasMes||(st.notas&&Object.keys(st.notas).length?{[S.meses[0]]:st.notas}:{});S.guardado=st.guardado||null;
   S.personas.forEach(p=>{if(!('desde' in p))p.desde=null;if(!('hasta' in p))p.hasta=null;if(!('vac' in p))p.vac=null;});
   S.turnos.forEach((t,i)=>{if(!t.id)t.id='t'+i;});normReps();
