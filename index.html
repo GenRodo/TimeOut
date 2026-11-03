@@ -675,27 +675,32 @@ function workedHours(pn,d){if(cerrado(d))return 0;const n=NOVIX[pn+'|'+d];let h=
 function libreRows(d){if(cerrado(d))return [];return S.personas.filter(p=>p.c!=='Apoyo'&&!sh(p.n,d).some(t=>t.t==='c')&&((REPIX[p.n+'|'+d]||[]).length||(EXIX[p.n+'|'+d]||[]).length)).map(p=>({p,h:workedHours(p.n,d)})).filter(x=>x.h>0).sort((a,b)=>AREAS.indexOf(a.p.a)-AREAS.indexOf(b.p.a));}
 function workedSpans(pn,d){const n=NOVIX[pn+'|'+d],L=[];sh(pn,d).forEach(t=>{if(!absT(n,t))L.push(rS(t)+'–'+rE(t)+(t.rs||t.re?' (horario real)':'')+(t.t==='ap'?' (apertura)':t.t==='apoyo'?' (apoyo)':''));else if(n.tipo==='falla')L.push(t.s+'–'+t.e+' (con falla)');});
   (REPIX[pn+'|'+d]||[]).forEach(o=>L.push(o.s+'–'+o.e+' (reemplazo de '+tc(o.de)+')'));(EXIX[pn+'|'+d]||[]).forEach(o=>L.push(o.s+'–'+o.e+' (horas extra)'));return L.join(', ');}
-function cierre(p,ym){const r={atr:0,sal:0,fer:0,ferD:0,progD:0,progH:0,trabD:0,trabH:0,ap:0,fallaH:0,fallas:0,vac:0,psg:0,lic:0,cubre:0,extra:0,libres:0,apoD:0,apoH:0};
-  const apoDays={},libres={};
-  monthDays(ym).forEach(d=>{if(cerrado(d))return;if(S.feriados[d]){const fw=workedHours(p.n,d);if(fw>0){r.fer+=fw;r.ferD++;}}const own=sh(p.n,d),n=NOVIX[p.n+'|'+d];let cH=0,cA=0,apA=0;
+function cierre(p,ym){const r={atr:0,sal:0,fer:0,ferD:0,progD:0,progH:0,trabD:0,trabH:0,ap:0,fallaH:0,fallas:0,vac:0,psg:0,lic:0,cubre:0,extra:0,libres:0,apoD:0,apoH:0,trabHP:0,atrP:0,salP:0};
+  const apoDays={},libres={};   // trabHP, atrP y salP: lo mismo, pero solo de los días con contrato part time
+  monthDays(ym).forEach(d=>{if(cerrado(d))return;if(S.feriados[d]){const fw=workedHours(p.n,d);if(fw>0){r.fer+=fw;r.ferD++;}}const own=sh(p.n,d),n=NOVIX[p.n+'|'+d],pt=cOn(p,d)==='Part';let cH=0,cA=0,apA=0;
     own.forEach(t=>{const x=dT(t);
       if(t.t==='apoyo'){r.apoH+=x;apoDays[d]=1;}
       else if(t.t==='ap'){if(!absT(n,t))r.ap+=x;else apA+=x;}
-      else{const xp=dur(t.s,t.e);cH+=xp;if(absT(n,t))cA+=xp;else if(t.rs||t.re){const q=realDiff(t);r.atr+=q.atr;r.sal+=q.sal;r.extra+=q.ext/60;}}});
+      else{const xp=dur(t.s,t.e);cH+=xp;if(absT(n,t))cA+=xp;else if(t.rs||t.re){const q=realDiff(t);r.atr+=q.atr;r.sal+=q.sal;if(pt){r.atrP+=q.atr;r.salP+=q.sal;}r.extra+=q.ext/60;}}});
     if(cH>0){r.progD++;r.progH+=cH;let left=cH-cA;
       if(cA>0&&n.tipo==='falla')left=cH-Math.min(cA,Math.max(0,fallaH(n)-apA));
-      r.trabH+=left;if(left>0&&left>=cH/2)r.trabD++;}
+      r.trabH+=left;if(pt)r.trabHP+=left;if(left>0&&left>=cH/2)r.trabD++;}
     (EXIX[p.n+'|'+d]||[]).forEach(o=>{const x=dur(o.s,o.e);if(p.c==='Apoyo'){r.apoH+=x;apoDays[d]=1;}else{r.extra+=x;if(!sh(p.n,d).some(t=>t.t==='c'))libres[d]=1;}});
     (REPIX[p.n+'|'+d]||[]).forEach(o=>{const x=dur(o.s,o.e);
       if(o.pago==='apoyo'){r.apoH+=x;apoDays[d]=1;}else if(o.pago==='extra')r.extra+=x;else r.cubre+=x;
       if(p.c!=='Apoyo'&&!sh(p.n,d).some(t=>t.t==='c'))libres[d]=1;});});
-  S.nov.filter(n=>n.p===p.n).forEach(n=>{if(n.tipo==='atr'){if(ymOf(n.d1)===ym)r.atr+=+n.min||0;}else if(n.tipo==='falla'){if(ymOf(n.d1)===ym){r.fallas++;r.fallaH+=fallaH(n);}}else r[n.tipo]+=novDays(n,ym);});
+  S.nov.filter(n=>n.p===p.n).forEach(n=>{if(n.tipo==='atr'){if(ymOf(n.d1)===ym){r.atr+=+n.min||0;if(cOn(p,n.d1)==='Part')r.atrP+=+n.min||0;}}else if(n.tipo==='falla'){if(ymOf(n.d1)===ym){r.fallas++;r.fallaH+=fallaH(n);}}else r[n.tipo]+=novDays(n,ym);});
   r.apoD=Object.keys(apoDays).length;r.libres=Object.keys(libres).length;r.libH=Object.keys(libres).reduce((a,d)=>a+workedHours(p.n,d),0);r.antic=S.anticipos.filter(a=>a.p===p.n&&a.ym===ym).reduce((s,a)=>s+a.monto,0);r.cons=S.consumos.filter(c=>c.p===p.n&&ymOf(c.d)===ym).reduce((s,c)=>s+consCalc(c).tot,0);r.pagar=diasPagar(p,ym);
-  const fs=fallaSplit(p.n,ym);r.fallaD=fs.d;r.fallaHd=fs.h;return r;}
+  const fs=fallaSplit(p.n,ym);r.fallaD=fs.d;r.fallaHd=fs.h;r.hayPart=monthDays(ym).some(d=>cOn(p,d)==='Part');return r;}
 function diasPagar(p,ym){if(p.c==='Apoyo')return null;const f=ym+'-01',l=lastDay(ym),base=S.metas.base==='mes'?+l.slice(8):30;
   if((p.desde&&p.desde>l)||(p.hasta&&p.hasta<f))return 0;
   const st=p.desde&&ymOf(p.desde)===ym?+p.desde.slice(8):1,en=p.hasta&&ymOf(p.hasta)===ym?Math.min(+p.hasta.slice(8),base):base;
-  let d=Math.max(0,en-st+1);S.nov.forEach(n=>{if(n.p===p.n&&(n.tipo==='psg'||n.tipo==='lic'))d-=novDays(n,ym);});return Math.max(0,d);}
+  /* si en el mes cambia entre part y full time, solo cuentan los días como full time (como alguien que entra a mitad de mes);
+     las horas como part time van en "Horas a pagar" */
+  const md=monthDays(ym),mix=(p.cHist||[]).length&&md.some(x=>cOn(p,x)==='Full')&&md.some(x=>cOn(p,x)==='Part');
+  if(!mix){let d=Math.max(0,en-st+1);S.nov.forEach(n=>{if(n.p===p.n&&(n.tipo==='psg'||n.tipo==='lic'))d-=novDays(n,ym);});return Math.max(0,d);}
+  const ft=x=>cOn(p,x)==='Full';let d=0;for(let i=st;i<=en;i++)if(ft(ym+'-'+String(i).padStart(2,'0')))d++;
+  S.nov.forEach(n=>{if(n.p===p.n&&(n.tipo==='psg'||n.tipo==='lic'))d-=range(n.d1,n.d2).filter(x=>ymOf(x)===ym&&ft(x)).length;});return Math.max(0,d);}
 
 /* ---------- meses cerrados: al cerrar se guarda el cierre tal como está y el mes queda de solo lectura ---------- */
 const mesCerr=ym=>!!S.cerrados[ym];
@@ -716,11 +721,15 @@ function fallaSplit(pn,ym){const p=person(pn),r={d:0,h:0};
   S.nov.forEach(n=>{if(n.p!==pn||n.tipo!=='falla'||ymOf(n.d1)!==ym)return;const x=fallaH(n),c=dayHours(pn,n.d1,['c']);
     if(cOn(p,n.d1)==='Full'&&c>0&&x>=c)r.d++;else r.h+=x;});return r;}
 /* columnas de descuento de una fila del cierre: fallaD (días), fallaH (horas a descontar), desc (total en minutos) y
-   hpag (solo part time, en minutos: horas trabajadas, que ya vienen sin fallas, menos atrasos y salidas anticipadas).
-   Los cierres guardados antes de esta regla no traen fallaD: se sacan de las ausencias del mes, que no cambian. */
+   hpag (en minutos, solo de los días como part time: horas trabajadas, que ya vienen sin fallas, menos atrasos y salidas
+   anticipadas). Así, si el contrato cambia a mitad de mes, lo de los días full time no se cuenta como part time.
+   Los cierres guardados antes de estas reglas no traen fallaD ni trabHP: se sacan del horario y las ausencias del mes,
+   que en un mes cerrado no cambian. */
 function descF(f,ym){const q=f.q,s=q.fallaD!=null?{d:q.fallaD,h:q.fallaHd}:fallaSplit(f.n,ym);
-  return {fallaD:s.d,fallaH:s.h,desc:Math.round(s.h*60+(f.c==='Full'?0:(q.atr||0)+(q.sal||0))),
-    hpag:f.c==='Part'?Math.max(0,Math.round((q.trabH||0)*60-(q.atr||0)-(q.sal||0))):null};}
+  let t=q.trabHP!=null?q:null;if(!t){const p=person(f.n);t=p?cierre(p,ym):null;}
+  if(!t){const pt=f.c==='Part';t={trabHP:pt?q.trabH:0,atrP:pt?q.atr:0,salP:pt?q.sal:0,hayPart:pt};}
+  return {fallaD:s.d,fallaH:s.h,desc:Math.round(s.h*60+(t.atrP||0)+(t.salP||0)),
+    hpag:t.hayPart?Math.max(0,Math.round((t.trabHP||0)*60-(t.atrP||0)-(t.salP||0))):null};}
 const HMF='[h]" h "mm" min"';   // formato de Excel para el total: el valor va en días (minutos / 1440)
 function hmin(m){const h=Math.floor(m/60),r=m%60;return h?h+' h'+(r?' '+r+' min':''):r+' min';}
 function realDiff(t){const sp=span(t),near=(v,ref)=>{while(v<ref-720)v+=1440;while(v>ref+720)v-=1440;return v;};
@@ -819,7 +828,7 @@ function vCierre(){const ym=ui.mes,z=S.cerrados[ym],base=z?z.base:S.metas.base;
         if((k==='pagar')||(f.c==='Apoyo'&&(k==='apoH'||k==='apoD')))cls='k';
         h+=v?`<td class="${cls}">${fh(v)}</td>`:'<td class="z">–</td>';});
       h+='</tr>';});});
-  h+=`</tbody></table></div><p class="nota">Días a pagar: base de ${base==='mes'?'los días del mes':'30 días'}, menos permisos sin goce y licencias; si alguien entró o salió este mes, cuenta desde su ingreso o hasta su salida. Vacaciones y feriados no se descuentan. Descuentos (sin los justificados): en full time, la falla de día completo va en días y los atrasos y salidas anticipadas quedan anotados, en gris, pero no se descuentan; en part time, y en la falla de solo una parte del día, se descuenta en horas. Total a descontar (horas) suma lo que va en horas. La app no lo resta de los días a pagar: se descuenta al pagar. Horas a pagar (part time) ya viene descontado: horas trabajadas, que ya no incluyen las fallas, menos atrasos y salidas anticipadas. Días y horas trabajadas muestran lo que realmente trabajó según el horario. Vacaciones se cuentan en días hábiles (lunes a viernes, sin restar feriados); permiso sin goce y licencia, en días corridos. Puedes ajustar los días en cada ausencia.</p>`;
+  h+=`</tbody></table></div><p class="nota">Días a pagar: base de ${base==='mes'?'los días del mes':'30 días'}, menos permisos sin goce y licencias; si alguien entró o salió este mes, cuenta desde su ingreso o hasta su salida. Vacaciones y feriados no se descuentan. Descuentos (sin los justificados): en full time, la falla de día completo va en días y los atrasos y salidas anticipadas quedan anotados, en gris, pero no se descuentan; en part time, y en la falla de solo una parte del día, se descuenta en horas. Total a descontar (horas) suma lo que va en horas. La app no lo resta de los días a pagar: se descuenta al pagar. Horas a pagar (part time) ya viene descontado: horas trabajadas, que ya no incluyen las fallas, menos atrasos y salidas anticipadas. Si el contrato cambia a mitad de mes, Horas a pagar cuenta solo los días como part time y Días a pagar, solo los días como full time. Días y horas trabajadas muestran lo que realmente trabajó según el horario. Vacaciones se cuentan en días hábiles (lunes a viernes, sin restar feriados); permiso sin goce y licencia, en días corridos. Puedes ajustar los días en cada ausencia.</p>`;
   const L=S.nov.filter(n=>ymOf(n.d1)<=ym&&ymOf(n.d2)>=ym).sort((a,b)=>a.d1<b.d1?-1:1);
   {const XL=[];S.extras.filter(x=>ymOf(x.d)===ym).forEach(x=>XL.push({p:x.p,d:x.d,s:x.s,e:x.e,txt:x.m||'Horas extra',act:`data-act="ed" data-p="${esc(x.p)}" data-d="${x.d}"`}));
     realExtras(ym).forEach(x=>XL.push(Object.assign(x,{act:`data-act="ed" data-p="${esc(x.p)}" data-d="${x.d}"`})));
@@ -962,7 +971,7 @@ function vPersona(){let p=person(ui.persona);if(!p||!ACT[p.n]){p=S.personas.find
   {const z=S.cerrados[ui.mes],f=z&&z.filas.find(x=>x.n===p.n),q=f?f.q:cierre(p,ui.mes),c=f?f.c:cMes(p,ui.mes);
     const sv=f?(q.saldo==null?'Sin dato':fh(q.saldo)):(p.vac==null?'Sin dato':fh(p.vac-used)),ft=c==='Full',dq=descF({n:p.n,c,q},ui.mes);
     const items=c==='Apoyo'?[['Días de apoyo',fh(q.apoD)],['Horas de apoyo',fh(q.apoH)],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]]
-      :[['Días a pagar',fh(q.pagar),1],['Días trabajados',fh(q.trabD)],['Horas trabajadas',fh(q.trabH)],...(c==='Part'?[['Horas a pagar',hmin(dq.hpag),1]]:[]),['Horas de apertura',fh(q.ap)],['Horas extra',fh(q.extra)],['Cubrió turnos',fh(q.cubre)+' h'],['Días libres trabajados',q.libres+(q.libH?' ('+fh(q.libH)+' h)':'')],['Feriados trabajados',q.ferD+(q.fer?' ('+fh(q.fer)+' h)':'')],...(ft?[['Fallas (días a descontar)',dq.fallaD+(dq.fallaD===1?' día':' días'),dq.fallaD>0]]:[]),['Fallas (h a descontar)',fh(dq.fallaH)+' h'],['Atrasos'+(ft?' (no se descuentan)':''),fh(q.atr)+' min'],['Salidas anticipadas'+(ft?' (no se descuentan)':''),fh(q.sal)+' min'],['Total a descontar (horas)',hmin(dq.desc),dq.desc>0],['Vacaciones',fh(q.vac)+' días'],['Saldo vacaciones',sv],['Permiso sin goce',fh(q.psg)+' días'],['Licencia',fh(q.lic)+' días'],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]];
+      :[['Días a pagar',fh(q.pagar),1],['Días trabajados',fh(q.trabD)],['Horas trabajadas',fh(q.trabH)],...(dq.hpag!=null?[['Horas a pagar',hmin(dq.hpag),1]]:[]),['Horas de apertura',fh(q.ap)],['Horas extra',fh(q.extra)],['Cubrió turnos',fh(q.cubre)+' h'],['Días libres trabajados',q.libres+(q.libH?' ('+fh(q.libH)+' h)':'')],['Feriados trabajados',q.ferD+(q.fer?' ('+fh(q.fer)+' h)':'')],...(ft?[['Fallas (días a descontar)',dq.fallaD+(dq.fallaD===1?' día':' días'),dq.fallaD>0]]:[]),['Fallas (h a descontar)',fh(dq.fallaH)+' h'],['Atrasos'+(ft?' (no se descuentan)':''),fh(q.atr)+' min'],['Salidas anticipadas'+(ft?' (no se descuentan)':''),fh(q.sal)+' min'],['Total a descontar (horas)',hmin(dq.desc),dq.desc>0],['Vacaciones',fh(q.vac)+' días'],['Saldo vacaciones',sv],['Permiso sin goce',fh(q.psg)+' días'],['Licencia',fh(q.lic)+' días'],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]];
     h+=`<h3 class="sth">Resumen de ${MESES[+ui.mes.slice(5,7)-1]}${f?' (mes cerrado)':''}</h3><div class="stats">${items.map(([k,v,hi])=>`<div class="st${hi?' hi':''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;}
   if(narrow()){h+='<h3 class="sth">Horario</h3>';weeksOf(ui.mes).forEach(w=>{const st=stats(p,w);h+=`<div class="card wk"><div class="wkh"><b>Semana ${w.n}</b><span class="muted">${w.lbl}</span><span class="wkm st-${p.c==='Apoyo'?'neutral':st.cls}">${fh(st.h)} h${st.meta?' · '+esc(st.meta):''}</span></div>${w.days.filter(x=>x.inMonth).map(x=>{const c=cellBtn(p,x);return c?`<div class="drow"><span class="dl">${DIAS[x.dow]} ${x.day}</span>${c}</div>`:'';}).join('')}</div>`;});return h;}
   h+='<h3 class="sth">Horario</h3><div class="scroll"><table class="grid"><thead><tr><th class="who">Semana</th>';DIAS.forEach(d=>{h+=`<th scope="col">${d}</th>`;});h+='</tr></thead><tbody>';
@@ -1837,7 +1846,7 @@ function buildWorkbook(ym,mode,pn){
           if(['fallaD','fallaH','atr','sal','vac','psg','lic'].includes(k)&&v)st=X({},st,{color:'9C0006'});
           if((k==='atr'||k==='sal')&&v&&f.c==='Full')st=X({},ST.n,{color:'808080'});   // full time: se anota, no se descuenta
           if(k==='antic'||k==='cons')st=X({},st,{fmt:'"$"#,##0'});s.set(r,i+3,v==null||v===0?'':r2(v),st);});r++;});});
-    r++;s.set(r,0,'Días a pagar: base de '+(S.metas.base==='mes'?'los días del mes':'30 días')+', menos permisos sin goce y licencias (desde el ingreso o hasta la salida si fue en el mes). Vacaciones y feriados no se descuentan. Full time: la falla de día completo se descuenta en días; los atrasos y salidas anticipadas van en gris y no se descuentan. Part time y fallas de una parte del día: en horas, sumadas en Total a descontar (horas). Todo se descuenta al pagar. Horas a pagar (part time) ya viene descontado: horas trabajadas (sin las fallas) menos atrasos y salidas anticipadas.',ST.sub);}
+    r++;s.set(r,0,'Días a pagar: base de '+(S.metas.base==='mes'?'los días del mes':'30 días')+', menos permisos sin goce y licencias (desde el ingreso o hasta la salida si fue en el mes). Vacaciones y feriados no se descuentan. Full time: la falla de día completo se descuenta en días; los atrasos y salidas anticipadas van en gris y no se descuentan. Part time y fallas de una parte del día: en horas, sumadas en Total a descontar (horas). Todo se descuenta al pagar. Horas a pagar (part time) ya viene descontado: horas trabajadas (sin las fallas) menos atrasos y salidas anticipadas. Si el contrato cambia a mitad de mes, Horas a pagar cuenta solo los días como part time y Días a pagar, solo los días como full time.',ST.sub);}
 
   /* Anticipos */
   if(!solo&&!uno){const s=B.sheet('Anticipos'),H=['Nombre','Cargo','RUT','Fecha','Monto solicitado','Observaciones'],M={sz:9,bd:1,h:'right',fmt:'"$"#,##0'};title(s,'Anticipos, '+ymName(ym),H.length,'Máximo: full time '+money(S.metas.antFull)+', part time '+money(S.metas.antPart)+'. Un anticipo por persona al mes.');
@@ -1874,7 +1883,7 @@ function buildWorkbook(ym,mode,pn){
       if(hasta)INFO.push(['Último día (desvinculado)',fy(hasta)]);
       INFO.forEach(([k,v],i)=>{const rr=r+Math.floor(i/2),c=(i%2)*3,rojo=(k==='RUT'&&!f.rut)||/^Último/.test(k);s.set(rr,c,k,X({},L,{fill:'EDEDED',b:1}));s.set(rr,c+1,v,X({},L,rojo?{color:'C00000',b:1}:{}));});r+=Math.ceil(INFO.length/2)+1;
       const ft=f.c==='Full',dq=descF(f,ym);
-      const left=ap?[['Días de apoyo',q.apoD],['Horas de apoyo',q.apoH]]:[['Días a pagar',q.pagar,1],['Días trabajados',q.trabD],['Horas trabajadas',q.trabH],...(f.c==='Part'?[['Horas a pagar',dq.hpag/1440,1,2]]:[]),['Horas de apertura',q.ap],['Horas extra',q.extra],['Horas cubriendo turnos',q.cubre],['Días libres trabajados',q.libres],['Horas en días libres',q.libH],['Feriados trabajados (días)',q.ferD],['Feriados trabajados (h)',q.fer]];
+      const left=ap?[['Días de apoyo',q.apoD],['Horas de apoyo',q.apoH]]:[['Días a pagar',q.pagar,1],['Días trabajados',q.trabD],['Horas trabajadas',q.trabH],...(dq.hpag!=null?[['Horas a pagar',dq.hpag/1440,1,2]]:[]),['Horas de apertura',q.ap],['Horas extra',q.extra],['Horas cubriendo turnos',q.cubre],['Días libres trabajados',q.libres],['Horas en días libres',q.libH],['Feriados trabajados (días)',q.ferD],['Feriados trabajados (h)',q.fer]];
       const right=(ap?[]:[...(ft?[['Fallas (días a descontar)',dq.fallaD]]:[]),['Fallas (h a descontar)',dq.fallaH],[ft?'Atrasos (min, no se descuentan)':'Atrasos (min)',q.atr],[ft?'Salidas anticipadas (min, no se descuentan)':'Salidas anticipadas (min)',q.sal],['Total a descontar (horas)',dq.desc/1440,0,2],['Vacaciones (días)',q.vac],['Saldo vacaciones',saldo],['Permiso sin goce (días)',q.psg],['Licencia (días)',q.lic]]).concat([['Anticipo',q.antic,0,1],['Consumo',q.cons,0,1]]);
       s.set(r,0,'Asistencia',ST.hdr);s.set(r,1,'',ST.hdr);s.merge(r,0,r,1);s.set(r,3,'Descuentos y pagos',ST.hdr);s.set(r,4,'',ST.hdr);s.merge(r,3,r,4);r++;
       const n=Math.max(left.length,right.length);
