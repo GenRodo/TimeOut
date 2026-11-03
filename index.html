@@ -172,6 +172,8 @@ dialog::backdrop{background:rgba(10,16,15,.45)}
 .cierre th{font-size:12px;color:var(--muted);font-weight:600;vertical-align:bottom;white-space:normal;min-width:64px}
 .cierre td:first-child,.cierre th:first-child,.cierre td:nth-child(2),.cierre th:nth-child(2){text-align:left}
 .cierre td.k{font-weight:800}
+.cierre td.desc{font-weight:800}
+.cierre td.desc small{display:block;font-size:11px;font-weight:500;color:var(--muted)}
 .cierre td.z{color:var(--line)}
 .cierre td.neg{color:var(--over);font-weight:700}
 .cierre tr.grp th{text-align:left}
@@ -706,6 +708,10 @@ function cierreFilas(ym){const z=S.cerrados[ym];if(z)return z.filas;const L=[];
 
 /* ---------- piezas visuales ---------- */
 function mm(m){return m>=60?fh(m/60)+' h':m+' min';}
+/* total a descontar del mes, en minutos: fallas (h) + atrasos + salidas anticipadas (min). Los justificados no vienen sumados. */
+const descMin=q=>Math.round((q.fallaH||0)*60+(q.atr||0)+(q.sal||0));
+const HMF='[h]" h "mm" min"';   // formato de Excel para el total: el valor va en días (minutos / 1440)
+function hmin(m){const h=Math.floor(m/60),r=m%60;return h?h+' h'+(r?' '+r+' min':''):r+' min';}
 function realDiff(t){const sp=span(t),near=(v,ref)=>{while(v<ref-720)v+=1440;while(v>ref+720)v-=1440;return v;};
   const ra=t.rs?near(mins(t.rs),sp[0]):sp[0],rb=t.re?near(mins(t.re),sp[1]):sp[1],di=ra-sp[0],dO=rb-sp[1];
   const ci=di>0?(['atr','just'].includes(t.ci)?t.ci:'atr'):(['ext','no'].includes(t.ci)?t.ci:'ext');
@@ -785,7 +791,7 @@ function vResumen(){const m=S.metas,W=weeksOf(ui.mes);
       h+=`<td class="n">${fh(tot)}</td><td>${fh(ap)}</td><td class="n">${fh(tot+ap)}</td></tr>`;});});
   return h+`</tbody></table></div><p class="nota">Horas programadas, brutas (entrada a salida, sin descontar colación). Las semanas parciales en full time solo muestran las horas. Las ausencias y reemplazos se ven en el cierre del mes.</p>`;}
 
-const CCOLS=[['pagar','Días a pagar'],['trabD','Días trabajados'],['trabH','Horas trabajadas'],['ap','Aperturas (h)'],['fallaH','Fallas (h a descontar)'],['atr','Atrasos (min)'],['sal','Salidas anticipadas (min)'],['vac','Vacaciones (días)'],['saldo','Saldo vacaciones'],['psg','Permiso sin goce (días)'],['lic','Licencia (días)'],['cubre','Cubrió turnos (h)'],['extra','Horas extra'],['libres','Días libres trabajados'],['libH','Días libres trabajados (h)'],['ferD','Feriados trabajados (días)'],['fer','Feriados trabajados (h)'],['apoD','Apoyo (días)'],['apoH','Apoyo (h)'],['antic','Anticipo ($)'],['cons','Consumo ($)']];
+const CCOLS=[['pagar','Días a pagar'],['trabD','Días trabajados'],['trabH','Horas trabajadas'],['ap','Aperturas (h)'],['fallaH','Fallas (h a descontar)'],['atr','Atrasos (min)'],['sal','Salidas anticipadas (min)'],['desc','Total a descontar'],['vac','Vacaciones (días)'],['saldo','Saldo vacaciones'],['psg','Permiso sin goce (días)'],['lic','Licencia (días)'],['cubre','Cubrió turnos (h)'],['extra','Horas extra'],['libres','Días libres trabajados'],['libH','Días libres trabajados (h)'],['ferD','Feriados trabajados (días)'],['fer','Feriados trabajados (h)'],['apoD','Apoyo (días)'],['apoH','Apoyo (h)'],['antic','Anticipo ($)'],['cons','Consumo ($)']];
 function vCierre(){const ym=ui.mes,z=S.cerrados[ym],base=z?z.base:S.metas.base;
   let h=z?`<div class="banner"><span><b>Mes cerrado</b> el ${cerrFecha(ym)}. Estas cifras quedaron guardadas y el mes no se puede cambiar.</span><button class="btn" data-act="reabrir">Reabrir mes</button></div>`
     :`<div class="metas"><label>Días base de la liquidación<select data-meta2="base"><option value="30"${S.metas.base!=='mes'?' selected':''}>30 días siempre</option><option value="mes"${S.metas.base==='mes'?' selected':''}>Días del mes (28 a 31)</option></select></label><button class="btn cerrb" data-act="cerrar">Cerrar ${MESES[+ym.slice(5,7)-1]}</button></div>`+revision(ym);
@@ -796,10 +802,11 @@ function vCierre(){const ym=ui.mes,z=S.cerrados[ym],base=z?z.base:S.metas.base;
       h+=`<tr><td class="n"><button class="nm" data-act="persona" data-p="${esc(f.n)}">${esc(tc(f.n))}</button></td><td>${esc(f.cl)}</td>`;
       CCOLS.forEach(([k])=>{let v=r[k],cls='';
         if(k==='saldo'){h+=f.c==='Apoyo'?'<td class="z">–</td>':(v==null?'<td class="z" title="Falta ingresar días disponibles">–</td>':`<td class="${v<0?'neg':''}">${fh(v)}</td>`);return;}
+        if(k==='desc'){const m=descMin(r);h+=m?`<td class="desc">${hmin(m)}<small>${fh(m/60)} h</small></td>`:'<td class="z">–</td>';return;}
         if((k==='pagar')||(k==='trabH'&&f.c==='Part')||(f.c==='Apoyo'&&(k==='apoH'||k==='apoD')))cls='k';
         h+=v?`<td class="${cls}">${fh(v)}</td>`:'<td class="z">–</td>';});
       h+='</tr>';});});
-  h+=`</tbody></table></div><p class="nota">Días a pagar: base de ${base==='mes'?'los días del mes':'30 días'}, menos permisos sin goce y licencias; si alguien entró o salió este mes, cuenta desde su ingreso o hasta su salida. Vacaciones y feriados no se descuentan, y las fallas se descuentan en horas. Días y horas trabajadas muestran lo que realmente trabajó según el horario. Vacaciones se cuentan en días hábiles (lunes a viernes, sin restar feriados); permiso sin goce y licencia, en días corridos. Puedes ajustar los días en cada ausencia.</p>`;
+  h+=`</tbody></table></div><p class="nota">Días a pagar: base de ${base==='mes'?'los días del mes':'30 días'}, menos permisos sin goce y licencias; si alguien entró o salió este mes, cuenta desde su ingreso o hasta su salida. Vacaciones y feriados no se descuentan. Total a descontar suma las fallas, los atrasos y las salidas anticipadas del mes (sin los justificados); la app no lo resta de los días a pagar, se descuenta al pagar. Días y horas trabajadas muestran lo que realmente trabajó según el horario. Vacaciones se cuentan en días hábiles (lunes a viernes, sin restar feriados); permiso sin goce y licencia, en días corridos. Puedes ajustar los días en cada ausencia.</p>`;
   const L=S.nov.filter(n=>ymOf(n.d1)<=ym&&ymOf(n.d2)>=ym).sort((a,b)=>a.d1<b.d1?-1:1);
   {const XL=[];S.extras.filter(x=>ymOf(x.d)===ym).forEach(x=>XL.push({p:x.p,d:x.d,s:x.s,e:x.e,txt:x.m||'Horas extra',act:`data-act="ed" data-p="${esc(x.p)}" data-d="${x.d}"`}));
     realExtras(ym).forEach(x=>XL.push(Object.assign(x,{act:`data-act="ed" data-p="${esc(x.p)}" data-d="${x.d}"`})));
@@ -942,7 +949,7 @@ function vPersona(){let p=person(ui.persona);if(!p||!ACT[p.n]){p=S.personas.find
   {const z=S.cerrados[ui.mes],f=z&&z.filas.find(x=>x.n===p.n),q=f?f.q:cierre(p,ui.mes),c=f?f.c:cMes(p,ui.mes);
     const sv=f?(q.saldo==null?'Sin dato':fh(q.saldo)):(p.vac==null?'Sin dato':fh(p.vac-used));
     const items=c==='Apoyo'?[['Días de apoyo',fh(q.apoD)],['Horas de apoyo',fh(q.apoH)],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]]
-      :[['Días a pagar',fh(q.pagar),1],['Días trabajados',fh(q.trabD)],['Horas trabajadas',fh(q.trabH),c==='Part'],['Horas de apertura',fh(q.ap)],['Horas extra',fh(q.extra)],['Cubrió turnos',fh(q.cubre)+' h'],['Días libres trabajados',q.libres+(q.libH?' ('+fh(q.libH)+' h)':'')],['Feriados trabajados',q.ferD+(q.fer?' ('+fh(q.fer)+' h)':'')],['Fallas',fh(q.fallaH)+' h'],['Atrasos',fh(q.atr)+' min'],['Salidas anticipadas',fh(q.sal)+' min'],['Vacaciones',fh(q.vac)+' días'],['Saldo vacaciones',sv],['Permiso sin goce',fh(q.psg)+' días'],['Licencia',fh(q.lic)+' días'],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]];
+      :[['Días a pagar',fh(q.pagar),1],['Días trabajados',fh(q.trabD)],['Horas trabajadas',fh(q.trabH),c==='Part'],['Horas de apertura',fh(q.ap)],['Horas extra',fh(q.extra)],['Cubrió turnos',fh(q.cubre)+' h'],['Días libres trabajados',q.libres+(q.libH?' ('+fh(q.libH)+' h)':'')],['Feriados trabajados',q.ferD+(q.fer?' ('+fh(q.fer)+' h)':'')],['Fallas',fh(q.fallaH)+' h'],['Atrasos',fh(q.atr)+' min'],['Salidas anticipadas',fh(q.sal)+' min'],['Total a descontar',hmin(descMin(q)),descMin(q)>0],['Vacaciones',fh(q.vac)+' días'],['Saldo vacaciones',sv],['Permiso sin goce',fh(q.psg)+' días'],['Licencia',fh(q.lic)+' días'],['Anticipo',money(q.antic)],['Consumo',money(q.cons)]];
     h+=`<h3 class="sth">Resumen de ${MESES[+ui.mes.slice(5,7)-1]}${f?' (mes cerrado)':''}</h3><div class="stats">${items.map(([k,v,hi])=>`<div class="st${hi?' hi':''}"><span>${k}</span><b>${v}</b></div>`).join('')}</div>`;}
   if(narrow()){h+='<h3 class="sth">Horario</h3>';weeksOf(ui.mes).forEach(w=>{const st=stats(p,w);h+=`<div class="card wk"><div class="wkh"><b>Semana ${w.n}</b><span class="muted">${w.lbl}</span><span class="wkm st-${p.c==='Apoyo'?'neutral':st.cls}">${fh(st.h)} h${st.meta?' · '+esc(st.meta):''}</span></div>${w.days.filter(x=>x.inMonth).map(x=>{const c=cellBtn(p,x);return c?`<div class="drow"><span class="dl">${DIAS[x.dow]} ${x.day}</span>${c}</div>`:'';}).join('')}</div>`;});return h;}
   h+='<h3 class="sth">Horario</h3><div class="scroll"><table class="grid"><thead><tr><th class="who">Semana</th>';DIAS.forEach(d=>{h+=`<th scope="col">${d}</th>`;});h+='</tr></thead><tbody>';
@@ -1806,15 +1813,16 @@ function buildWorkbook(ym,mode,pn){
   /* Cierre */
   if(!solo&&!uno){const s=B.sheet('Cierre'),nc=CCOLS.length+3;title(s,'Cierre de '+ymName(ym),nc,S.cerrados[ym]?'Mes cerrado el '+cerrFecha(ym,1)+'. '+gen:gen);
     let r=3;['Área','Trabajador','Contrato'].concat(CCOLS.map(c=>c[1])).forEach((h,c)=>s.set(r,c,h,ST.hdr));s.heights[r]=42;
-    s.width(0,10);s.width(1,18);s.width(2,12);CCOLS.forEach((_,i)=>s.width(i+3,11));s.freeze={r:4,c:2};r++;
+    s.width(0,10);s.width(1,18);s.width(2,12);CCOLS.forEach((c,i)=>s.width(i+3,c[0]==='desc'?13:11));s.freeze={r:4,c:2};r++;
     AREAS.forEach(a=>{s.set(r,0,a,ST.grp);for(let c=1;c<nc;c++)s.set(r,c,'',ST.grp);s.merge(r,0,r,nc-1);r++;
       FI.filter(f=>f.a===a).forEach(f=>{const q=f.q;
         s.set(r,0,a,ST.l);s.set(r,1,tc(f.n),X({},ST.l,{b:1}));s.set(r,2,f.cl,ST.l);
-        CCOLS.forEach(([k],i)=>{const v=q[k];const key=(k==='pagar'&&f.c!=='Apoyo')||(k==='trabH'&&f.c==='Part')||(f.c==='Apoyo'&&(k==='apoH'||k==='apoD'));
+        CCOLS.forEach(([k],i)=>{if(k==='desc'){const m=descMin(q);s.set(r,i+3,m?m/1440:'',X({},ST.n,{b:1,color:'9C0006',fmt:HMF}));return;}
+          const v=q[k];const key=(k==='pagar'&&f.c!=='Apoyo')||(k==='trabH'&&f.c==='Part')||(f.c==='Apoyo'&&(k==='apoH'||k==='apoD'));
           let st=key?ST.tot:ST.n;if(k==='saldo'&&v!=null&&v<0)st=X({},st,{color:'C00000',b:1});
           if(['fallaH','atr','sal','vac','psg','lic'].includes(k)&&v)st=X({},st,{color:'9C0006'});
           if(k==='antic'||k==='cons')st=X({},st,{fmt:'"$"#,##0'});s.set(r,i+3,v==null||v===0?'':r2(v),st);});r++;});});
-    r++;s.set(r,0,'Días a pagar: base de '+(S.metas.base==='mes'?'los días del mes':'30 días')+', menos permisos sin goce y licencias (desde el ingreso o hasta la salida si fue en el mes). Vacaciones y feriados no se descuentan; las fallas se descuentan en horas.',ST.sub);}
+    r++;s.set(r,0,'Días a pagar: base de '+(S.metas.base==='mes'?'los días del mes':'30 días')+', menos permisos sin goce y licencias (desde el ingreso o hasta la salida si fue en el mes). Vacaciones y feriados no se descuentan. Total a descontar suma fallas, atrasos y salidas anticipadas (sin los justificados) y se descuenta al pagar.',ST.sub);}
 
   /* Anticipos */
   if(!solo&&!uno){const s=B.sheet('Anticipos'),H=['Nombre','Cargo','RUT','Fecha','Monto solicitado','Observaciones'],M={sz:9,bd:1,h:'right',fmt:'"$"#,##0'};title(s,'Anticipos, '+ymName(ym),H.length,'Máximo: full time '+money(S.metas.antFull)+', part time '+money(S.metas.antPart)+'. Un anticipo por persona al mes.');
@@ -1851,12 +1859,12 @@ function buildWorkbook(ym,mode,pn){
       if(hasta)INFO.push(['Último día (desvinculado)',fy(hasta)]);
       INFO.forEach(([k,v],i)=>{const rr=r+Math.floor(i/2),c=(i%2)*3,rojo=(k==='RUT'&&!f.rut)||/^Último/.test(k);s.set(rr,c,k,X({},L,{fill:'EDEDED',b:1}));s.set(rr,c+1,v,X({},L,rojo?{color:'C00000',b:1}:{}));});r+=Math.ceil(INFO.length/2)+1;
       const left=ap?[['Días de apoyo',q.apoD],['Horas de apoyo',q.apoH]]:[['Días a pagar',q.pagar,1],['Días trabajados',q.trabD],['Horas trabajadas',q.trabH,f.c==='Part'],['Horas de apertura',q.ap],['Horas extra',q.extra],['Horas cubriendo turnos',q.cubre],['Días libres trabajados',q.libres],['Horas en días libres',q.libH],['Feriados trabajados (días)',q.ferD],['Feriados trabajados (h)',q.fer]];
-      const right=(ap?[]:[['Fallas (h a descontar)',q.fallaH],['Atrasos (min)',q.atr],['Salidas anticipadas (min)',q.sal],['Vacaciones (días)',q.vac],['Saldo vacaciones',saldo],['Permiso sin goce (días)',q.psg],['Licencia (días)',q.lic]]).concat([['Anticipo',q.antic,0,1],['Consumo',q.cons,0,1]]);
+      const right=(ap?[]:[['Fallas (h a descontar)',q.fallaH],['Atrasos (min)',q.atr],['Salidas anticipadas (min)',q.sal],['Total a descontar',descMin(q)/1440,0,2],['Vacaciones (días)',q.vac],['Saldo vacaciones',saldo],['Permiso sin goce (días)',q.psg],['Licencia (días)',q.lic]]).concat([['Anticipo',q.antic,0,1],['Consumo',q.cons,0,1]]);
       s.set(r,0,'Asistencia',ST.hdr);s.set(r,1,'',ST.hdr);s.merge(r,0,r,1);s.set(r,3,'Descuentos y pagos',ST.hdr);s.set(r,4,'',ST.hdr);s.merge(r,3,r,4);r++;
       const n=Math.max(left.length,right.length);
       for(let i=0;i<n;i++){const l=left[i],g=right[i];
         if(l){s.set(r+i,0,l[0],X({},L,l[2]?HI:{}));s.set(r+i,1,typeof l[1]==='number'?r2(l[1]):l[1],X({},V,l[2]?HI:{}));}
-        if(g){s.set(r+i,3,g[0],L);s.set(r+i,4,typeof g[1]==='number'?r2(g[1]):g[1],g[3]?MON:V);}}
+        if(g){s.set(r+i,3,g[0],L);s.set(r+i,4,g[3]===2?g[1]:typeof g[1]==='number'?r2(g[1]):g[1],g[3]===2?X({},V,{fmt:HMF}):g[3]?MON:V);}}
       r+=n+1;
       const NV=S.nov.filter(x=>x.p===f.n&&ymOf(x.d1)<=ym&&ymOf(x.d2)>=ym).sort((a,b)=>a.d1<b.d1?-1:1);
       if(NV.length){s.set(r,0,'Ausencias del mes',ST.hdr);for(let c=1;c<5;c++)s.set(r,c,'',ST.hdr);s.merge(r,0,r,4);r++;
